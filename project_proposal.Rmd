@@ -1,5 +1,5 @@
 ---
-title: "Project Proposal"
+title: "Project Proposal - Analysis of finance-related Reddit Communities"
 output: html_document
 ---
 ```{r, include=F}
