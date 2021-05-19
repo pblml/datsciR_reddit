@@ -22,9 +22,9 @@ Several interesting questions regarding the influence of these subreddits on the
 
 ## Background
 
-Reddit is an online community that has growth exponentially since its foundation back in 2005[@EvolutionReddit]. Over the past of the years a big amount of subcommunities, also known as subreddits, has been created. This subreddits allows people to communicate in a specific topic in form of threaded conversations. The structure of Reddit and the easy access to the posts and interactions between useres has motivated the study of different social behavior on the existing communities [@SocialRolesReddit][@PredictingReddit].  
+Reddit is an online network of communities that has growth exponentially since its foundation back in 2005[@EvolutionReddit]. Over the past years a big amount of subcommunities, also known as subreddits, has been created. Inside each subreddit the users can  interact in a related topics in form of threaded conversations and votes. This community structure and the easy access to the posts and interactions between users had motivated the study of different social behavior on the existing subreddits [@SocialRolesReddit;@PredictingReddit].  
 
-
+Inside social media platforms it is possible to identify communities. A social media community can be roughly defined as a small subset of entities that have a elements in common, which could be for example a topic. In a broader sense, the communities are represented as subgraphs and it is possible to divide the community detection methods into graph partitioning and graph clustering [@papadopoulos2012community].
 
 ## Project objectives
 
