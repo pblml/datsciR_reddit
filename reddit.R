@@ -4,7 +4,7 @@ library(tidygraph)
 library(ggraph)
 library(visNetwork)
 
-raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 20, page_threshold = 999)
+raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 20, page_threshold = 999,)
 
 content <- raw_data %>% 
   mutate(
@@ -40,6 +40,3 @@ visNetwork(nodes, edges) %>%
   visNodes(size = 10) %>%
   visOptions(highlightNearest = list(enabled = T, hover = T), 
              nodesIdSelection = T)
-
-
-GME_df <- raw_data
