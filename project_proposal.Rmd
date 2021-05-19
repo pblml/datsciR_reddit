@@ -1,0 +1,54 @@
+---
+title: "Project Proposal"
+output: html_document
+---
+```{r, include=F}
+library(tidyverse)
+source("DB_conexion.R")
+```
+
+## Team
+
+Diana Guzman (230227), Philipp Blüml (204231)
+
+## Background and motivation
+
+In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it. 
+ 
+Several interesting questions regarding the influence of these subreddits on the stock market emerge from this event. In this project, we want to detect communities in finance related subreddits and mine their sentiment towards discussed stocks to measure if they either have significant influence on or can predict market movements.
+
+## Project objectives
+
+1. Create a standard way to extract subreddit data (comment level) via the Reddit API
+2. Detect communities inside the subreddits and extracting stocks discussed inside these communities
+3. Analyzing sentiments towards discussed stocks and correlate them to stock market data
+
+## Datasets
+
+* Using the Reddit API to fetch data from different finance-related subreddits ([r/finance](www.reddit.com/r/finance), [r/wallstreetbets](www.reddit.com/r/wallstreets), [r/stocks](www.reddit.com/r/stocks), ...)
+* Using the [Yahoo Finance API](https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html) to fetch historical market data
+
+## Data persistence
+
+For this project we intend to create a database using MongoDB Atlas in order to store and interact with the datasets.
+
+## Design overview
+
+* Create a pipeline to extract financial data using the Reddit API with the method get_reddit from [RedditExtractoR](https://cran.r-project.org/web/packages/RedditExtractoR/RedditExtractoR.pdf) library
+* Community detection and evaluation algorithms
+* Sentiment analysis
+
+## Time plan
+
+| Task                                                          | Responsible    | Deadline   |
+|:--------------------------------------------------------------|:---------------|:-----------|
+| Finding a cloud database solution                             | Diana          | 20.05.2021 |
+| Setting up a git                                              | Philipp        | 20.05.2021 |
+| Implementing the ETL pipeline <br>reddit data <br>market data | Philipp, Diana | 27.05.2021 |
+| Layout of the Markdown Document                               | Philipp, Diana | 03.06.2021 |
+| Exploratory data analysis                                     | Philipp, Diana | 10.06.2021 |
+| Network analysis                                              | Philipp, Diana | 17.06.2021 |
+| Sentiment analysis                                            | Philipp, Diana | 23.06.2021 |
+| Correlating results to market data                            | Philipp, Diana | 01.07.2021 |
+| Final project submission                                      | Philipp, Diana | 06.07.2021 |
+| Final presentation                                            | Philipp, Diana | 09.07.2021 |

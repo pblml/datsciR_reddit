@@ -40,12 +40,12 @@ saveData <- function(databaseName,collectionName,data) {
 
 
 databaseName <- "reddit"
-collectionName <- "finance"
+collectionName <- "wallstreetbets"
 
 #read data from test data
-finance <- read.csv(file = '/datasets/reddit_finance/finance/submissions_reddit.csv')
+#finance <- read.csv(file = '/datasets/reddit_finance/finance/submissions_reddit.csv')
 #store information from csv in database
-saveData(databaseName,collectionName,finance)
+#saveData(databaseName,collectionName,raw_data)
 
 #load data from database 
 financedb <- loadData(databaseName,collectionName)
