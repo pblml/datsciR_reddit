@@ -1,21 +1,30 @@
 ---
 title: "Project Proposal - Analysis of finance-related Reddit Communities"
-output: html_document
+output: 
+  prettydoc::html_pretty:
+    theme: architect 
+bibliography: references.bib
 ---
 ```{r, include=F}
 library(tidyverse)
-source("DB_conexion.R")
+#source("DB_conexion.R")
 ```
 
 ## Team
 
 Diana Guzman (230227), Philipp Blüml (204231)
 
-## Background and motivation
+## Motivation
 
-In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it. 
+In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place[@RePEc]. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it. 
  
 Several interesting questions regarding the influence of these subreddits on the stock market emerge from this event. In this project, we want to detect communities in finance related subreddits and mine their sentiment towards discussed stocks to measure if they either have significant influence on or can predict market movements.
+
+## Background
+
+Reddit is an online community that has growth exponentially since its foundation back in 2005[@EvolutionReddit]. Over the past of the years a big amount of subcommunities, also known as subreddits, has been created. This subreddits allows people to communicate in a specific topic in form of threaded conversations. The structure of Reddit and the easy access to the posts and interactions between useres has motivated the study of different social behavior on the existing communities [@SocialRolesReddit][@PredictingReddit].  
+
+
 
 ## Project objectives
 
@@ -52,3 +61,6 @@ For this project we intend to create a database using MongoDB Atlas in order to 
 | Correlating results to market data                            | Philipp, Diana | 01.07.2021 |
 | Final project submission                                      | Philipp, Diana | 06.07.2021 |
 | Final presentation                                            | Philipp, Diana | 09.07.2021 |
+
+
+## References
