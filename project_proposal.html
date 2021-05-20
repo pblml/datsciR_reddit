@@ -14,17 +14,59 @@
 
 <title>Project Proposal - Analysis of finance-related Reddit Communities</title>
 
-<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
-// be compatible with the behavior of Pandoc < 2.8).
-document.addEventListener('DOMContentLoaded', function(e) {
-  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
-  var i, h, a;
-  for (i = 0; i < hs.length; i++) {
-    h = hs[i];
-    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
-    a = h.attributes;
-    while (a.length > 0) h.removeAttribute(a[0].name);
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
   }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
 });
 </script>
 
@@ -62,13 +104,13 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </div>
 <div id="motivation" class="section level2">
 <h2>Motivation</h2>
-<p>In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place<span class="citation">(Di Muzio 2021)</span>. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it.</p>
+<p>In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place<span class="citation">[1]</span>. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it.</p>
 <p>Several interesting questions regarding the influence of these subreddits on the stock market emerge from this event. In this project, we want to detect communities in finance related subreddits and mine their sentiment towards discussed stocks to measure if they either have significant influence on or can predict market movements.</p>
 </div>
 <div id="background" class="section level2">
 <h2>Background</h2>
-<p>Reddit is an online network of communities that has growth exponentially since its foundation back in 2005<span class="citation">(Singer et al. 2014)</span>. Over the past years a big amount of subcommunities, also known as subreddits, has been created. Inside each subreddit the users can interact in a related topics in form of threaded conversations and votes. This community structure and the easy access to the posts and interactions between users had motivated the study of different social behavior on the existing subreddits <span class="citation">(Buntain and Golbeck 2014; Glenski and Weninger 2017)</span>.</p>
-<p>Inside social media platforms it is possible to identify communities. A social media community can be roughly defined as a small subset of entities that have a elements in common, which could be for example a topic. In a broader sense, the communities are represented as subgraphs and it is possible to divide the community detection methods into graph partitioning and graph clustering <span class="citation">(Papadopoulos et al. 2012)</span>.</p>
+<p>Reddit is an online network of communities that has growth exponentially since its foundation back in 2005<span class="citation">[2]</span>. Over the past years a lot of subcommunities, also known as subreddits, have formed. Inside each subreddit the users can interact in the form of threaded conversations and give votes on comments or posts. This community structure and the availabity of retrieveing the posts and subseqqunt interactions between users had motivated the study of social behavior in existing subreddits <span class="citation">[3], [4]</span>.</p>
+<p>Inside social media platforms it is possible to identify communities. A social media community can be roughly defined as a subset of entities that have elements in common, which could be, for example, a topic. In a broader sense, the communities are represented as subgraphs which can be identified via community detection methods such as graph partitioning and graph clustering <span class="citation">[5]</span>.</p>
 </div>
 <div id="project-objectives" class="section level2">
 <h2>Project objectives</h2>
@@ -94,16 +136,16 @@ document.addEventListener('DOMContentLoaded', function(e) {
 <ul>
 <li>Create a pipeline to extract financial data using the Reddit API with the method get_reddit from <a href="https://cran.r-project.org/web/packages/RedditExtractoR/RedditExtractoR.pdf">RedditExtractoR</a> library</li>
 <li>Community detection and evaluation algorithms</li>
-<li>Sentiment analysis</li>
+<li>Sentiment analysis over stocks discussed in the communities</li>
 </ul>
 </div>
 <div id="time-plan" class="section level2">
 <h2>Time plan</h2>
 <table>
 <colgroup>
-<col width="69%" />
-<col width="17%" />
-<col width="13%" />
+<col width="69%"></col>
+<col width="17%"></col>
+<col width="13%"></col>
 </colgroup>
 <thead>
 <tr class="header">
@@ -166,23 +208,27 @@ document.addEventListener('DOMContentLoaded', function(e) {
 </tbody>
 </table>
 </div>
+<div id="github-repository" class="section level2">
+<h2>Github Repository</h2>
+<p>The link to the repository for this project is: <a href="https://github.com/pblml/datsciR_reddit" class="uri">https://github.com/pblml/datsciR_reddit</a></p>
+</div>
 <div id="references" class="section level2 unnumbered">
-<h2 class="unnumbered">References</h2>
-<div id="refs" class="references hanging-indent">
-<div id="ref-SocialRolesReddit">
-<p>Buntain, Cody, and Jennifer Golbeck. 2014. “Identifying Social Roles in Reddit Using Network Structure.” In <em>Proceedings of the 23rd International Conference on World Wide Web</em>, 615–20. WWW ’14 Companion. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/2567948.2579231">https://doi.org/10.1145/2567948.2579231</a>.</p>
-</div>
+<h2>References</h2>
+<div id="refs" class="references">
 <div id="ref-RePEc">
-<p>Di Muzio, Tim. 2021. “GameStop Capitalism. Wall Street Vs. The Reddit Rally (Part I).” EconStor Preprints. ZBW - Leibniz Information Centre for Economics. <a href="https://EconPapers.repec.org/RePEc:zbw:esprep:229951">https://EconPapers.repec.org/RePEc:zbw:esprep:229951</a>.</p>
-</div>
-<div id="ref-PredictingReddit">
-<p>Glenski, Maria, and Tim Weninger. 2017. “Predicting User-Interactions on Reddit.” In <em>Proceedings of the 2017 Ieee/Acm International Conference on Advances in Social Networks Analysis and Mining 2017</em>, 609–12. ASONAM ’17. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/3110025.3120993">https://doi.org/10.1145/3110025.3120993</a>.</p>
-</div>
-<div id="ref-papadopoulos2012community">
-<p>Papadopoulos, Symeon, Yiannis Kompatsiaris, Athena Vakali, and Ploutarchos Spyridonos. 2012. “Community Detection in Social Media.” <em>Data Mining and Knowledge Discovery</em> 24 (3): 515–54.</p>
+<p>[1] T. Di Muzio, “GameStop capitalism. Wall street vs. The reddit rally (part i),” ZBW - Leibniz Information Centre for Economics, EconStor Preprints, 2021. [Online]. Available: <a href="https://EconPapers.repec.org/RePEc:zbw:esprep:229951">https://EconPapers.repec.org/RePEc:zbw:esprep:229951</a>.</p>
 </div>
 <div id="ref-EvolutionReddit">
-<p>Singer, Philipp, Fabian Flöck, Clemens Meinhart, Elias Zeitfogel, and Markus Strohmaier. 2014. “Evolution of Reddit: From the Front Page of the Internet to a Self-Referential Community?” In <em>Proceedings of the 23rd International Conference on World Wide Web</em>, 517–22. WWW ’14 Companion. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/2567948.2576943">https://doi.org/10.1145/2567948.2576943</a>.</p>
+<p>[2] P. Singer, F. Flöck, C. Meinhart, E. Zeitfogel, and M. Strohmaier, “Evolution of reddit: From the front page of the internet to a self-referential community?” in <em>Proceedings of the 23rd international conference on world wide web</em>, 2014, pp. 517–522, doi: <a href="https://doi.org/10.1145/2567948.2576943">10.1145/2567948.2576943</a>.</p>
+</div>
+<div id="ref-SocialRolesReddit">
+<p>[3] C. Buntain and J. Golbeck, “Identifying social roles in reddit using network structure,” in <em>Proceedings of the 23rd international conference on world wide web</em>, 2014, pp. 615–620, doi: <a href="https://doi.org/10.1145/2567948.2579231">10.1145/2567948.2579231</a>.</p>
+</div>
+<div id="ref-PredictingReddit">
+<p>[4] M. Glenski and T. Weninger, “Predicting user-interactions on reddit,” in <em>Proceedings of the 2017 ieee/acm international conference on advances in social networks analysis and mining 2017</em>, 2017, pp. 609–612, doi: <a href="https://doi.org/10.1145/3110025.3120993">10.1145/3110025.3120993</a>.</p>
+</div>
+<div id="ref-papadopoulos2012community">
+<p>[5] S. Papadopoulos, Y. Kompatsiaris, A. Vakali, and P. Spyridonos, “Community detection in social media,” <em>Data Mining and Knowledge Discovery</em>, vol. 24, no. 3, pp. 515–554, 2012.</p>
 </div>
 </div>
 </div>

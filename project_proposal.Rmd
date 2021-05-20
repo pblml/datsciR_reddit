@@ -4,6 +4,7 @@ output:
   prettydoc::html_pretty:
     theme: architect 
 bibliography: references.bib
+csl: ieee.csl
 ---
 
 ## Team
@@ -42,7 +43,7 @@ For this project we intend to create a database using MongoDB Atlas in order to 
 
 * Create a pipeline to extract financial data using the Reddit API with the method get_reddit from [RedditExtractoR](https://cran.r-project.org/web/packages/RedditExtractoR/RedditExtractoR.pdf) library
 * Community detection and evaluation algorithms
-* Sentiment analysis
+* Sentiment analysis over stocks discussed in the communities
 
 ## Time plan
 
@@ -59,5 +60,8 @@ For this project we intend to create a database using MongoDB Atlas in order to 
 | Final project submission                                      | Philipp, Diana | 06.07.2021 |
 | Final presentation                                            | Philipp, Diana | 09.07.2021 |
 
+## Github Repository
+
+The link to the repository for this project is: https://github.com/pblml/datsciR_reddit
 
 ## References
