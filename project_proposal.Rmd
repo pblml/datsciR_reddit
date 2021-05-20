@@ -5,10 +5,6 @@ output:
     theme: architect 
 bibliography: references.bib
 ---
-```{r, include=F}
-library(tidyverse)
-#source("DB_conexion.R")
-```
 
 ## Team
 
@@ -22,9 +18,10 @@ Several interesting questions regarding the influence of these subreddits on the
 
 ## Background
 
-Reddit is an online network of communities that has growth exponentially since its foundation back in 2005[@EvolutionReddit]. Over the past years a big amount of subcommunities, also known as subreddits, has been created. Inside each subreddit the users can  interact in a related topics in form of threaded conversations and votes. This community structure and the easy access to the posts and interactions between users had motivated the study of different social behavior on the existing subreddits [@SocialRolesReddit;@PredictingReddit].  
+Reddit is an online network of communities that has growth exponentially since its foundation back in 2005[@EvolutionReddit]. Over the past years a lot of subcommunities, also known as subreddits, have formed. Inside each subreddit the users can interact in the form of threaded conversations and give votes on comments or posts. This community structure and the availabity of retrieveing the posts and subseqqunt interactions between users had motivated the study of social behavior in existing subreddits [@SocialRolesReddit;@PredictingReddit].
 
-Inside social media platforms it is possible to identify communities. A social media community can be roughly defined as a small subset of entities that have a elements in common, which could be for example a topic. In a broader sense, the communities are represented as subgraphs and it is possible to divide the community detection methods into graph partitioning and graph clustering [@papadopoulos2012community].
+
+Inside social media platforms it is possible to identify communities. A social media community can be roughly defined as a subset of entities that have elements in common, which could be, for example, a topic. In a broader sense, the communities are represented as subgraphs  which can be identified via  community detection methods such as graph partitioning and graph clustering [@papadopoulos2012community].
 
 ## Project objectives
 

@@ -14,59 +14,17 @@
 
 <title>Project Proposal - Analysis of finance-related Reddit Communities</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
-});
-</script>
-<style type="text/css">
-a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
-a.anchor-section::before {content: '#';}
-.hasAnchor:hover a.anchor-section {visibility: visible;}
-</style>
-<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
-document.addEventListener('DOMContentLoaded', function() {
-  // Do nothing if AnchorJS is used
-  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
-    return;
-  }
-
-  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-
-  // Do nothing if sections are already anchored
-  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
-    return null;
-  }
-
-  // Use section id when pandoc runs with --section-divs
-  const section_id = function(x) {
-    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
-            ? x.id : '');
-  };
-
-  // Add anchors
-  h.forEach(function(x) {
-    const id = x.id || section_id(x.parentElement);
-    if (id === '') {
-      return null;
-    }
-    let anchor = document.createElement('a');
-    anchor.href = '#' + id;
-    anchor.classList = ['anchor-section'];
-    x.classList.add('hasAnchor');
-    x.appendChild(anchor);
-  });
 });
 </script>
 
@@ -110,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="background" class="section level2">
 <h2>Background</h2>
 <p>Reddit is an online network of communities that has growth exponentially since its foundation back in 2005<span class="citation">(Singer et al. 2014)</span>. Over the past years a big amount of subcommunities, also known as subreddits, has been created. Inside each subreddit the users can interact in a related topics in form of threaded conversations and votes. This community structure and the easy access to the posts and interactions between users had motivated the study of different social behavior on the existing subreddits <span class="citation">(Buntain and Golbeck 2014; Glenski and Weninger 2017)</span>.</p>
-<p>A social media community can be roughly defined as a small subset of entities that have a elements in common, which could be for example a topic. In a broader sense, the communities are represented as subgraphs and it is possible to divide the community detection methods into graph partitioning and graph clustering <span class="citation">(Papadopoulos et al. 2012)</span>.</p>
+<p>Inside social media platforms it is possible to identify communities. A social media community can be roughly defined as a small subset of entities that have a elements in common, which could be for example a topic. In a broader sense, the communities are represented as subgraphs and it is possible to divide the community detection methods into graph partitioning and graph clustering <span class="citation">(Papadopoulos et al. 2012)</span>.</p>
 </div>
 <div id="project-objectives" class="section level2">
 <h2>Project objectives</h2>
@@ -143,9 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <h2>Time plan</h2>
 <table>
 <colgroup>
-<col width="69%"></col>
-<col width="17%"></col>
-<col width="13%"></col>
+<col width="69%" />
+<col width="17%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -209,8 +167,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </table>
 </div>
 <div id="references" class="section level2 unnumbered">
-<h2>References</h2>
-<div id="refs" class="references">
+<h2 class="unnumbered">References</h2>
+<div id="refs" class="references hanging-indent">
 <div id="ref-SocialRolesReddit">
 <p>Buntain, Cody, and Jennifer Golbeck. 2014. “Identifying Social Roles in Reddit Using Network Structure.” In <em>Proceedings of the 23rd International Conference on World Wide Web</em>, 615–20. WWW ’14 Companion. New York, NY, USA: Association for Computing Machinery. <a href="https://doi.org/10.1145/2567948.2579231">https://doi.org/10.1145/2567948.2579231</a>.</p>
 </div>
