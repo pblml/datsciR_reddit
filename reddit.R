@@ -4,7 +4,7 @@ library(tidygraph)
 library(ggraph)
 library(visNetwork)
 
-raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 20, page_threshold = 999,)
+raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 10)
 
 content <- raw_data %>% 
   mutate(

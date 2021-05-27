@@ -47,5 +47,17 @@ collectionName <- "wallstreetbets"
 #store information from csv in database
 #saveData(databaseName,collectionName,raw_data)
 
+ETLflow <- function(reddit_list, databaseName) {
+  res_lst <- list()
+  for (sub in reddit_list) {
+    print(sub)
+    res_lst[[sub]] <- get_reddit(subreddit = sub, cn_threshold = 10)
+  }
+  return(None)
+}
+
+reddits <- c("finance", "stocks")
+
+ETLflow(reddits, databaseName)
 #load data from database 
 financedb <- loadData(databaseName,collectionName)
