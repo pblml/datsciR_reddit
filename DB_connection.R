@@ -1,10 +1,5 @@
 library(mongolite)
-
-options(mongodb = list(
-  "host" = "cluster0.xi7w2.mongodb.net",
-  "username" = "dcgr",
-  "password" = "FOw9ACHyEdmUPtwv"
-))
+source("config.R")
 
 loadData <- function(databaseName,collectionName) {
   # Connect to the database
@@ -47,17 +42,17 @@ collectionName <- "wallstreetbets"
 #store information from csv in database
 #saveData(databaseName,collectionName,raw_data)
 
-ETLflow <- function(reddit_list, databaseName) {
+exportAll <- function(reddit_list) {
   res_lst <- list()
   for (sub in reddit_list) {
     print(sub)
     res_lst[[sub]] <- get_reddit(subreddit = sub, cn_threshold = 10)
   }
-  return(None)
+  return(res_lst)
 }
 
 reddits <- c("finance", "stocks")
 
-ETLflow(reddits, databaseName)
+cmts_df_list <- exportAll(reddits)
 #load data from database 
-financedb <- loadData(databaseName,collectionName)
+#financedb <- loadData(databaseName,collectionName)
