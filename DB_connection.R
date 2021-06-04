@@ -42,17 +42,6 @@ collectionName <- "wallstreetbets"
 #store information from csv in database
 #saveData(databaseName,collectionName,raw_data)
 
-exportAll <- function(reddit_list) {
-  res_lst <- list()
-  for (sub in reddit_list) {
-    print(sub)
-    res_lst[[sub]] <- get_reddit(subreddit = sub, cn_threshold = 10)
-  }
-  return(res_lst)
-}
 
-reddits <- c("finance", "stocks")
-
-cmts_df_list <- exportAll(reddits)
 #load data from database 
 #financedb <- loadData(databaseName,collectionName)

@@ -40,3 +40,18 @@ visNetwork(nodes, edges) %>%
   visNodes(size = 10) %>%
   visOptions(highlightNearest = list(enabled = T, hover = T), 
              nodesIdSelection = T)
+
+exportAll <- function(reddit_list) {
+  res_lst <- list()
+  for (sub in reddit_list) {
+    print(sub)
+    res_lst[[sub]] <- get_reddit(search_terms="*", subreddit = sub, page_threshold = 1) %>%
+      mutate(post_date = lubridate::dmy(post_date),
+             comm_date = lubridate::dmy(comm_date))
+  }
+  return(res_lst)
+}
+
+reddits <- c("finance", "stocks")
+
+cmts_df_list <- exportAll(reddits)

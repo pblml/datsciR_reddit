@@ -26,7 +26,7 @@ Inside social media platforms it is possible to identify communities. A social m
 
 ## Project objectives
 
-1. Create a standard way to extract subreddit data (comment level) via the Reddit API
+1. Create an ETL-process to extract subreddit data (comment level) via the Reddit API and upload it to a MangoDB after cleaning
 2. Detect communities inside the subreddits and extracting stocks discussed inside these communities
 3. Analyzing sentiments towards discussed stocks and correlate them to stock market data
 
