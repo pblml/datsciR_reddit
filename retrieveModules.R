@@ -62,7 +62,7 @@ reddit_content2 <- function (URL, wait_time = 2) {
                             link = character(), domain = character(), URL = character())
   pb <- progress_bar$new(
     format = "  downloading [:bar] :percent eta: :eta",
-    total = length(seq_days), clear = FALSE, width= 60)
+    total = length(seq(URL)), clear = FALSE, width= 60)
   
   for (i in seq(URL)) {
     if (!grepl("^https?://(.*)", URL[i])) 
@@ -120,6 +120,7 @@ reddit_content2 <- function (URL, wait_time = 2) {
     pb$tick()
     Sys.sleep(min(2, wait_time))
   }
-  close(pb)
   return(data_extract)
 }
+
+ 
