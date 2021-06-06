@@ -1,0 +1,3 @@
+body > header:nth-child(2) {
+  background: url("www/wallstreetbets.png");
+}

@@ -1,0 +1,12 @@
+---
+title: "Analysis of finance-related Reddit Communities"
+output: 
+  prettydoc::html_pretty:
+    theme: architect 
+    css: "style.css"
+bibliography: references.bib
+csl: ieee.csl
+
+---
+
+# Title1

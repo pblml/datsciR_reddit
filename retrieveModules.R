@@ -1,17 +1,28 @@
 library(tidyverse)
+library(progress)
 
 reddit_urls <- function(subreddit, start_date, end_date) {
+  #extracts the top 100 submissions by comments from a subreddit
   #subreddit: string, subreddit to get URLs from
   #start_date: PosixCt datetime to start searching from
   #end_date: PosixCt datetime to search to
+  #one day ~ 3 secs
   
   url_list <- list()
-  for (day in seq(start_date, end_date, by="1 day")) {
-    print(day)
-    url_list[[paste0(day)]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=100",
-            as.numeric(day), as.numeric(day)+86399, subreddit) %>%
-      jsonlite::fromJSON()
-  }
+  seq_days <- seq(start_date, end_date, by="1 day")
+  pb <- progress_bar$new(
+    format = "  downloading [:bar] :percent eta: :eta",
+    total = length(seq_days), clear = FALSE, width= 60)
+  for (day in seq_days) {
+    pb$tick()
+    url_list[[paste0(as.integer(day))]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=101",
+            as.integer(day), as.integer(day)+86399, subreddit) %>%
+      jsonlite::fromJSON() %>% 
+      .$data %>%
+      as.data.frame() %>%
+      select(author, full_link, created_utc)
+    Sys.sleep(2)
+    }
   return(url_list)
 }
 
@@ -49,7 +60,10 @@ reddit_content2 <- function (URL, wait_time = 2) {
                             comment_score = numeric(), controversiality = numeric(), 
                             comment = character(), title = character(), post_text = character(), 
                             link = character(), domain = character(), URL = character())
-  pb = utils::txtProgressBar(min = 0, max = length(URL), style = 3)
+  pb <- progress_bar$new(
+    format = "  downloading [:bar] :percent eta: :eta",
+    total = length(seq_days), clear = FALSE, width= 60)
+  
   for (i in seq(URL)) {
     if (!grepl("^https?://(.*)", URL[i])) 
       URL[i] = paste0("https://www.", gsub("^.*(reddit\\..*$)", 
@@ -74,12 +88,12 @@ reddit_content2 <- function (URL, wait_time = 2) {
                                   function(x) get.structure(main.node[[x]], x)))
         TEMP = data.frame(id = NA, structure = gsub("FALSE ", 
                                                     "", structure[!grepl("TRUE", structure)]), 
-                          post_date = format(as.Date(as.POSIXct(meta.node$created_utc, 
-                                                                origin = "1970-01-01")), "%d-%m-%y"), 
-                          comm_date = format(as.Date(as.POSIXct(unlist(lapply(main.node, 
+                          post_date = as.POSIXct(meta.node$created_utc, 
+                                                                origin = "1970-01-01"), 
+                          comm_date = as.POSIXct(unlist(lapply(main.node,
                                                                               function(x) {
                                                                                 GetAttribute(x, "created_utc")
-                                                                              })), origin = "1970-01-01")), "%d-%m-%y %H:%M:%S"), 
+                                                                              })), origin = "1970-01-01"), 
                           num_comments = meta.node$num_comments, subreddit = ifelse(is.null(meta.node$subreddit), 
                                                                                     "UNKNOWN", meta.node$subreddit), upvote_prop = meta.node$upvote_ratio, 
                           post_score = meta.node$score, author = meta.node$author, 
@@ -103,7 +117,7 @@ reddit_content2 <- function (URL, wait_time = 2) {
                          URL[i]))
       }
     }
-    utils::setTxtProgressBar(pb, i)
+    pb$tick()
     Sys.sleep(min(2, wait_time))
   }
   close(pb)

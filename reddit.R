@@ -45,7 +45,7 @@ exportAll <- function(reddit_list) {
   res_lst <- list()
   for (sub in reddit_list) {
     print(sub)
-    res_lst[[sub]] <- get_reddit(search_terms="*", subreddit = sub, page_threshold = 1) %>%
+    res_lst[[sub]] <- get_reddit(subreddit = sub, sort="new", cn_threshold = 20, page_threshold = 50) %>%
       mutate(post_date = lubridate::dmy(post_date),
              comm_date = lubridate::dmy(comm_date))
   }
@@ -54,4 +54,4 @@ exportAll <- function(reddit_list) {
 
 reddits <- c("finance", "stocks")
 
-cmts_df_list <- exportAll(reddits)
+system.time(cmts_df_list <- exportAll("wallstreetbets"))
