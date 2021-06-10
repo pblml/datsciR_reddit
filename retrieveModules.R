@@ -1,6 +1,6 @@
 library(tidyverse)
 library(progress)
-
+source("DB_connection.R")
 reddit_urls <- function(subreddit, start_date, end_date) {
   #extracts the top 100 submissions by comments from a subreddit
   #subreddit: string, subreddit to get URLs from
@@ -89,11 +89,11 @@ reddit_content2 <- function (URL, wait_time = 2) {
         TEMP = data.frame(id = NA, structure = gsub("FALSE ", 
                                                     "", structure[!grepl("TRUE", structure)]), 
                           post_date = as.POSIXct(meta.node$created_utc, 
-                                                                origin = "1970-01-01"), 
+                                                                origin = "1970-01-01", tz = "UTC"), 
                           comm_date = as.POSIXct(unlist(lapply(main.node,
                                                                               function(x) {
                                                                                 GetAttribute(x, "created_utc")
-                                                                              })), origin = "1970-01-01"), 
+                                                                              })), origin = "1970-01-01", tz = "UTC"), 
                           num_comments = meta.node$num_comments, subreddit = ifelse(is.null(meta.node$subreddit), 
                                                                                     "UNKNOWN", meta.node$subreddit), upvote_prop = meta.node$upvote_ratio, 
                           post_score = meta.node$score, author = meta.node$author, 
@@ -123,4 +123,21 @@ reddit_content2 <- function (URL, wait_time = 2) {
   return(data_extract)
 }
 
- 
+ETL <- function(db_name, subreddit_vec, start_date, end_date) {
+  seq_days <- seq(start_date, end_date, by="1 day")
+  for (sub in subreddit_vec){
+    print(sub)
+    for (d in seq_days) {
+      print(as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
+      urls <- reddit_urls(sub, 
+                          as.POSIXct(d, origin = "1970-01-01", tz = "UTC"),
+                          as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
+      content <- reddit_content2(urls[[1]]$full_link)
+      saveData(db_name, sub, content)
+      print("SAVED")
+    }
+  }
+  
+}
+
+ETL("reddit", "stocks", lubridate::ymd_hms("2020-12-01 00:00:00"), lubridate::ymd_hms("2020-12-31 00:00:00"))
