@@ -132,7 +132,7 @@ ETL <- function(db_name, subreddit_vec, start_date, end_date) {
       urls <- reddit_urls(sub, 
                           as.POSIXct(d, origin = "1970-01-01", tz = "UTC"),
                           as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
-      content <- reddit_content2(urls[[1]]$full_link)
+      content <- reddit_content2(URLencode(urls[[1]]$full_link))
       saveData(db_name, sub, content)
       print("SAVED")
     }
@@ -140,4 +140,4 @@ ETL <- function(db_name, subreddit_vec, start_date, end_date) {
   
 }
 
-ETL("reddit", "stocks", lubridate::ymd_hms("2020-12-01 00:00:00"), lubridate::ymd_hms("2020-12-31 00:00:00"))
+ETL("reddit", "stocks", lubridate::ymd_hms("2020-12-21 00:00:00"), lubridate::ymd_hms("2020-12-31 00:00:00"))
