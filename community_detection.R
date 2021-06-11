@@ -9,7 +9,7 @@ raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 10) %>%
 
 #Select the columns needed
 clean_data <- raw_data %>%
-  subset( select = c(author,user,id,structure,title,comment,URL,comm_date))%>%#,
+  subset( select = c(author,user,id,structure,title,comment,URL,comm_date,post_text))%>%#,
   rename(
     from = author,
     to = user
@@ -33,6 +33,8 @@ plot(imc, g)
 #get all of the post related to users in a community
 communities_imc <- communities(imc)
 posts_first_community <- subset(clean_data,from %in% as.list(communities_imc$'1')|to %in% as.list(communities_imc$'1'))
+single_posts <- unique(posts_first_community$post_text)
+
 #sentiment analysis
 library("tm")
 library("SnowballC")
@@ -40,7 +42,7 @@ library("wordcloud")
 library("RColorBrewer")
 library("syuzhet")
 # Load the data as a corpus
-TextDoc <- Corpus(VectorSource(posts_first_community$comment))
+TextDoc <- Corpus(VectorSource(c(posts_first_community$comment,single_posts)))
 
 #Replacing "/", "@" and "|" with space
 toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
@@ -77,7 +79,7 @@ barplot(dtm_d[1:5,]$freq, las = 2, names.arg = dtm_d[1:5,]$word,
 
 #generate word cloud
 set.seed(1234)
-wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 2,
+wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 5,
           max.words=100, random.order=FALSE, rot.per=0.40, 
           colors=brewer.pal(8, "Dark2"))
 
@@ -86,6 +88,7 @@ findAssocs(TextDoc_dtm, terms = c("fuck"), corlimit = 0.5)
 
 # regular sentiment score using get_sentiment() function and method of your choice
 # please note that different methods may have different scales
+posts_first_community$sentiment <- get_sentiment(posts_first_community$comment, method="syuzhet")
 syuzhet_vector <- get_sentiment(posts_first_community$comment, method="syuzhet")
 # see the first row of the vector
 head(syuzhet_vector)
@@ -108,7 +111,7 @@ head (d,10)
 
 td<-data.frame(t(d))
 #The function rowSums computes column sums across rows for each level of a grouping variable.
-td_new <- data.frame(rowSums(td[2:59]))
+td_new <- data.frame(rowSums(td[2:40]))
 #Transformation and cleaning
 names(td_new)[1] <- "count"
 td_new <- cbind("sentiment" = rownames(td_new), td_new)
@@ -119,12 +122,33 @@ library(ggplot2)
 #Plot One - count of words associated with each sentiment
 quickplot(sentiment, data=td_new2, weight=count, geom="bar", fill=sentiment, ylab="count")+ggtitle("Survey sentiments")
 
+
+##-------------------------metrics ------------------------------------------------
+
+modularity(lc)
+modularity(imc)
+
+
+compare(lc, imc)
+
+
+##------------------------end metrics ---------------------------------------------
+
+
+
+
 ##-------------------------other algorithms ---------------------------------------
 #greedy
-greedy <- cluster_fast_greedy(g)
+greedy <- cluster_fast_greedy(g) # problem with multiple edges
 
 #cluster optimal 
 optimal <-cluster_optimal(g)
+modularity(optimal)
+compare(imc,optimal)
+#cluster edge betweenness
+cluster_eb <-cluster_edge_betweenness(g)
+modularity(cluster_eb)
+compare(optimal,cluster_eb)
 
 closeness(g, mode="all")
 ##-------------------------end other algorithms -----------------------------------
@@ -152,5 +176,13 @@ modularity_ml(net, community2)
 nmi_ml(net, community, community2)
 omega_index_ml(net, community, community2)
 
+
+# All community detection algorithms return a data frame where each row contains actor name, layer
+# name and community identifier.
+# The evaluation functions return a number between -1 and 1. For the comparison functions, 1 indicates that the two community structures are equivalent. The maximum possible value of modularity
+# is <= 1 and depends on the network, so modularity results should not be compared across different
+# networks. Also, notice that modularity is only defined for partitioning community structures.
+# get_community_list_ml transforms the output of a community detection function into a list by
+# grouping all the nodes having the same community identifier and the same layer.
 
 ##------------------end multinet library-------------------------------------------
