@@ -4,13 +4,11 @@ library(tidygraph)
 library(ggraph)
 library(visNetwork)
 
-raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 10)
-
 content <- raw_data %>% 
   mutate(
     from = paste0(author, "_", structure),
     to = gsub("^(.*)_\\d+$", "\\1", structure) %>%
-      paste0(getcontent$author, "_", .)
+      paste0(getcontent$title, "_", .)
     )
 
 edges <- content %>%
