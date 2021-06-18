@@ -1,0 +1,91 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup}
+library(tidyverse)
+library(sentimentr)
+library(quantmod)
+library(BatchGetSymbols)
+source("DB_connection.R")
+```
+
+Loading Data. No connection the database right now?
+```{r eval=F}
+content <- loadData("reddit", "finance")
+```
+```{r}
+content <- readRDS("content.Rds")
+```
+
+Adding ticker column. TODO: Make lists of ticker by observation possible
+"I bought AMC and BB" -> c("AMC", "BB")
+
+Using sentiment_by because fast
+
+```{r demo}
+stringr::str_match_all("I bought AMC and BB", '[^A-Za-z0-9]+([A-Z]{2,4})[^A-Za-z0-9]*')[[1]][,2]
+sentiment_by("It's hot outside, but I quite enjoy it. My plants are dying still")
+```
+
+```{r}
+dat <- content %>%
+  mutate(ticker = stringr::str_match(comment, '[^A-Za-z0-9]*([A-Z]{2,4})[^A-Za-z0-9]*')[,2],
+         sentiment = sentiment_by(get_sentences(comment))$ave_sentiment)
+head(dat %>% na.omit() %>% select(ticker, sentiment))
+```
+
+Getting the sentiment for the 15 most discussed tickers TODO: Blacklist YOLO, THE, WSB
+```{r}
+ticker_sentiment <- dat %>% 
+  group_by(ticker) %>%
+  summarise(count=n(), sentiment_ticker=mean(sentiment, na.rm = T)) %>%
+  arrange(desc(count)) %>%
+  na.omit() %>%
+  head(15)
+ticker_sentiment
+```
+
+getting market data for top 5 discussed tickers (FAST and Chached)
+
+```{r}
+tickers <- ticker_sentiment$symbol %>% head(5)
+l.out <- BatchGetSymbols(tickers = tickers, 
+                         first.date = min(dat$comm_date),
+                         last.date = max(dat$comm_date), 
+                         freq.data = "daily",
+                         cache.folder = file.path(tempdir(), 
+                                                  'BGS_Cache'))
+```
+```{r}
+l.out$df.tickers %>% 
+```
+```{r}
+dat_tmp <- dat %>%
+  group_by("Date" = lubridate::date(comm_date), ticker) %>%
+  summarise(sentiment=mean(sentiment),
+            vol_sentiment = n(),
+            upvote_prop = mean(upvote_prop, na.rm = T))
+
+ggplot() +
+  geom_line(data=l.out$df.tickers %>% filter(ticker=="AMC"), aes(x=ref.date, y=`price.adjusted`), col="red") +
+  geom_line(data=dat_tmp %>% filter(ticker=="AMC"), aes(x=Date, y=sentiment*500*upvote_prop), col="blue")
+
+#normalzing/scaling sentiment
+#second y-axis (not really a fan)
+#volume bars on bottom
+```
+
+```{r}
+plot_ticker_sentiment <- function(reddit_data, market_data, ticker) {
+  plot_lst <- list()
+  for (t in ticker){
+    p <- ggplot
+  }
+}
+```
+
+
