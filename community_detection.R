@@ -79,9 +79,7 @@ barplot(dtm_d[1:5,]$freq, las = 2, names.arg = dtm_d[1:5,]$word,
 
 #generate word cloud
 set.seed(1234)
-wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 5,
-          max.words=100, random.order=FALSE, rot.per=0.40, 
-          colors=brewer.pal(8, "Dark2"))
+ 
 
 # Find associations 
 findAssocs(TextDoc_dtm, terms = c("fuck"), corlimit = 0.5)			
@@ -154,35 +152,3 @@ closeness(g, mode="all")
 ##-------------------------end other algorithms -----------------------------------
 
 
-##------------------multinet library-----------------------------------------------
-library(multinet)
-net <- ml_empty()
-add_igraph_layer_ml(net, g, "comments")
-
-#community algorithms for multinet
-community <-glouvain_ml(net, gamma=1, omega=1, limit=0)
-plot(net, vertex.labels.cex=.5, com=community)
-
-community2 <-flat_ec_ml(net)
-plot(net, vertex.labels.cex=.5, com=community2)
- 
-community3 <- abacus_ml(net, min.actors=3, min.layers=1)
-plot(net, vertex.labels.cex=.5, com=community3)
-
-#evaluation 
-modularity_ml(net, community)
-modularity_ml(net, community2)
-
-nmi_ml(net, community, community2)
-omega_index_ml(net, community, community2)
-
-
-# All community detection algorithms return a data frame where each row contains actor name, layer
-# name and community identifier.
-# The evaluation functions return a number between -1 and 1. For the comparison functions, 1 indicates that the two community structures are equivalent. The maximum possible value of modularity
-# is <= 1 and depends on the network, so modularity results should not be compared across different
-# networks. Also, notice that modularity is only defined for partitioning community structures.
-# get_community_list_ml transforms the output of a community detection function into a list by
-# grouping all the nodes having the same community identifier and the same layer.
-
-##------------------end multinet library-------------------------------------------

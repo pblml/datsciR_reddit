@@ -17,6 +17,23 @@ loadData <- function(databaseName,collectionName) {
   data
 }
 
+loadDataDates <- function(databaseName,collectionName,initial_date, final_date) {
+  # Connect to the database
+  db <- mongo(collection = collectionName,
+              url = sprintf(
+                "mongodb+srv://%s:%s@%s/%s",
+                options()$mongodb$username,
+                options()$mongodb$password,
+                options()$mongodb$host,
+                databaseName
+              ),
+              options = ssl_options(weak_cert_validation = TRUE))
+  # Read all the entries
+  data <- db$find(sprintf('{"post_date" : { "$gte" : { "$date" : "%s" }},
+                    "post_date" : { "$lte" : { "$date" : "%s" }}}',format(as.Date(initial_date), "%Y-%m-%dT%H:%M:%SZ"),
+                          format(as.Date(final_date), "%Y-%m-%dT%H:%M:%SZ")))
+  data
+}
 
 saveData <- function(databaseName,collectionName,data) {
   # Connect to the database
