@@ -10,15 +10,16 @@ library(tidyverse)
 library(sentimentr)
 library(quantmod)
 library(BatchGetSymbols)
+library(plotly)
 source("DB_connection.R")
 ```
 
 Loading Data. No connection the database right now?
 ```{r eval=F}
-content <- loadData("reddit", "finance")
+content <- financedb
 ```
 ```{r}
-content <- readRDS("content.Rds")
+content <- loadData("reddit", "stocks")
 ```
 
 Adding ticker column. TODO: Make lists of ticker by observation possible
@@ -52,7 +53,7 @@ ticker_sentiment
 getting market data for top 5 discussed tickers (FAST and Chached)
 
 ```{r}
-tickers <- ticker_sentiment$symbol %>% head(5)
+tickers <- ticker_sentiment$ticker %>% head(5)
 l.out <- BatchGetSymbols(tickers = tickers, 
                          first.date = min(dat$comm_date),
                          last.date = max(dat$comm_date), 
@@ -60,24 +61,41 @@ l.out <- BatchGetSymbols(tickers = tickers,
                          cache.folder = file.path(tempdir(), 
                                                   'BGS_Cache'))
 ```
-```{r}
-l.out$df.tickers %>% 
-```
+
 ```{r}
 dat_tmp <- dat %>%
-  group_by("Date" = lubridate::date(comm_date), ticker) %>%
+  group_by("date" = lubridate::date(comm_date), ticker) %>%
   summarise(sentiment=mean(sentiment),
             vol_sentiment = n(),
             upvote_prop = mean(upvote_prop, na.rm = T))
-
-ggplot() +
-  geom_line(data=l.out$df.tickers %>% filter(ticker=="AMC"), aes(x=ref.date, y=`price.adjusted`), col="red") +
-  geom_line(data=dat_tmp %>% filter(ticker=="AMC"), aes(x=Date, y=sentiment*500*upvote_prop), col="blue")
-
-#normalzing/scaling sentiment
-#second y-axis (not really a fan)
-#volume bars on bottom
 ```
+
+```{r}
+fig1 <- l.out$df.tickers %>%
+  filter(ticker=="PLTR") %>%
+  plot_ly(x = ~ref.date, type="candlestick",
+          open = ~price.open, close = ~price.close,
+          high = ~price.high, low = ~price.low) %>%
+  layout(xaxis = list(rangeslider = list(visible = F)))
+
+ay <- list(
+  overlaying = "y2",
+  side = "right"
+)
+
+fig2 <- dat_tmp %>%
+  filter(ticker=="PLTR") %>%
+  plot_ly() %>%
+  add_trace(x=~date, y=~sentiment, name="sentiment", type="scatter", line=list(color="#00000"), mode="line") %>%
+  add_trace(x=~date, y=~vol_sentiment, name="vol_sentiment", type="bar",yaxis="y2") %>%
+  layout(yaxis2 = ay)
+
+
+
+subplot(fig1, fig2, nrows=2)
+```
+
+
 
 ```{r}
 plot_ticker_sentiment <- function(reddit_data, market_data, ticker) {
@@ -87,5 +105,7 @@ plot_ticker_sentiment <- function(reddit_data, market_data, ticker) {
   }
 }
 ```
+
+
 
 
