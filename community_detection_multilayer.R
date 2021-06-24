@@ -7,10 +7,11 @@ source("DB_connection.R")
 databaseName <- "reddit"
 collectionName <- "stocks"
 
-financedb <- loadDataDates(databaseName,collectionName,"2020-12-01","2020-12-03")
+raw_data <- loadDataDates(databaseName,collectionName,"2020-12-05","2020-12-10") %>%
+  filter(user!="[deleted]",author!="[deleted]")
 
-clean_data <- financedb %>%
-  subset( select = c(author,user,id,structure,title,comment,URL,comm_date,post_text))%>%#,
+clean_data <- raw_data %>%
+  subset( select = c(author,user,id,structure,title,comment,URL,comm_date,post_text))%>%
   rename(
     from = author,
     to = user
@@ -29,7 +30,7 @@ g <- graph_from_data_frame(first_layer,directed=FALSE)
 add_igraph_layer_ml(net, g, "first_comments")
 
 #second layer
-content <- financedb %>% 
+content <- raw_data %>% 
   filter(user!="[deleted]") %>%
   mutate(
     from = structure,

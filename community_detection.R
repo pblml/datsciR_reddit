@@ -1,31 +1,78 @@
-library(RedditExtractoR)
 library(tidyverse)
 library(tidygraph)
 library(ggraph)
 library(igraph)
+source("DB_connection.R")
 
-raw_data <- get_reddit(subreddit = "wallstreetbets", cn_threshold = 10) %>%
-  filter(user!="[deleted]") 
+databaseName <- "reddit"
+collectionName <- "stocks"
 
-#Select the columns needed
-clean_data <- raw_data %>%
-  subset( select = c(author,user,id,structure,title,comment,URL,comm_date,post_text))%>%#,
+raw_data <- loadDataDates(databaseName,collectionName,"2020-12-23","2020-12-25") %>%
+  filter(user!="[deleted]",author!="[deleted]")
+
+raw_data <-head(raw_data,500)
+
+#Select the direct comments to a post
+comments_posts <- raw_data %>%
+  filter(!grepl("_",structure)) %>%
   rename(
-    from = author,
-    to = user
-  )
+    from = user,
+    to = author
+  )%>%
+  subset( select = c(from,to))
+
+nested_comments <-raw_data %>% 
+  mutate(
+    from = structure,
+    to = gsub("^(.*)_\\d+$", "\\1", structure) 
+  )%>%
+  subset( select = c(user,from,to,link))%>%
+  left_join(., ., by=c( "link"="link","from"="to")) %>% 
+  drop_na("user.y") %>%
+  select("from"=user.y, "to"=user.x) 
+
+connections <-rbind(comments_posts, nested_comments) %>% 
+  filter(from!=to) %>% 
+  group_by(from, to) %>%
+  summarise(weight = n()) %>% 
+  ungroup() %>%
+  mutate(width = weight+5)
+
 #create igraph object
 #First two columns work as edge list and the others as 
-g <- graph_from_data_frame(clean_data,directed=FALSE)
+g <- graph_from_data_frame(connections,directed=FALSE)
+
+g
 
 # louvain community detection 
+start_time <- Sys.time()
 lc <- cluster_louvain(g)
+end_time <- Sys.time()
+total_time <-end_time - start_time
+
 membership(lc)
 communities(lc)
-plot(lc, g)
+plot(lc, g )
+tkplot(g)
+rglplot(g)
+
+#create dataframe with nodes and group for visualization
+nodes <-do.call(rbind.data.frame, as.list(V(g)$name))
+nodes$group =membership(lc)
+colnames(nodes)<-c('id','group')
+nodes$label =nodes$id
+edges <- get.data.frame(g, what= c("edges") )
+visNetwork(nodes, edges)%>%
+ # visOptions(selectedBy = "group", 
+ #             highlightNearest = TRUE) %>%
+  visClusteringByGroup(groups = unique(nodes$group), label="cluster: ")
+
+ 
 
 # infomap 
+start_time <- Sys.time()
 imc <- cluster_infomap(g)
+end_time <- Sys.time()
 membership(imc)
 communities(imc)
 plot(imc, g)
@@ -79,7 +126,9 @@ barplot(dtm_d[1:5,]$freq, las = 2, names.arg = dtm_d[1:5,]$word,
 
 #generate word cloud
 set.seed(1234)
- 
+wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 1,           
+          max.words=200, random.order=FALSE, rot.per=0.35,            
+          colors=brewer.pal(8, "Dark2"))
 
 # Find associations 
 findAssocs(TextDoc_dtm, terms = c("fuck"), corlimit = 0.5)			
@@ -139,8 +188,22 @@ compare(lc, imc)
 #greedy
 greedy <- cluster_fast_greedy(g) # problem with multiple edges
 
+start_time <- Sys.time()
+cluster_edge_betweenness <-cluster_edge_betweenness(g)
+end_time <- Sys.time()
+communities(cluster_edge_betweenness)
+modularity(cluster_edge_betweenness)
+
+start_time <- Sys.time()
+cl_lp <- cluster_label_prop(g)
+end_time <- Sys.time()
+communities(cl_lp)
+modularity(cl_lp)
+
 #cluster optimal 
+start_time <- Sys.time()
 optimal <-cluster_optimal(g)
+end_time <- Sys.time()
 modularity(optimal)
 compare(imc,optimal)
 #cluster edge betweenness
