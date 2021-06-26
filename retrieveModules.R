@@ -1,7 +1,7 @@
 library(tidyverse)
 library(progress)
 source("DB_connection.R")
-reddit_urls <- function(subreddit, start_date, end_date) {
+reddit_urls <- function(subreddit, start_date, end_date, num_urls=20) {
   #extracts the top 100 submissions by comments from a subreddit
   #subreddit: string, subreddit to get URLs from
   #start_date: PosixCt datetime to start searching from
@@ -14,14 +14,23 @@ reddit_urls <- function(subreddit, start_date, end_date) {
     format = "  downloading [:bar] :percent eta: :eta",
     total = length(seq_days), clear = FALSE, width= 60)
   for (day in seq_days) {
-    pb$tick()
-    url_list[[paste0(as.integer(day))]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=101",
-            as.integer(day), as.integer(day)+86399, subreddit) %>%
-      jsonlite::fromJSON() %>% 
-      .$data %>%
-      as.data.frame() %>%
-      select(author, full_link, created_utc)
-    Sys.sleep(2)
+    skip_to_next <- FALSE
+    
+    # Note that print(b) fails since b doesn't exist
+    
+    tryCatch({
+      pb$tick()
+      url_list[[paste0(as.integer(day))]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=50&num_comments=>%s",
+                                                     as.integer(day), as.integer(day)+86399, subreddit, num_urls) %>%
+          URLencode() %>%
+          jsonlite::fromJSON() %>% 
+          .$data %>%
+          as.data.frame() %>%
+          select(full_link)
+      Sys.sleep(1)}, error = function(e) { skip_to_next <<- TRUE})
+    
+    if(skip_to_next) {next}
+    
     }
   return(url_list)
 }
@@ -126,18 +135,22 @@ reddit_content2 <- function (URL, wait_time = 2) {
 ETL <- function(db_name, subreddit_vec, start_date, end_date) {
   seq_days <- seq(start_date, end_date, by="1 day")
   for (sub in subreddit_vec){
-    print(sub)
+    pb <- progress_bar$new(
+      format = sprintf("  %s [:bar] :percent eta: :eta", sub),
+      total = length(length(seq_days)), clear = FALSE, width= 60)
     for (d in seq_days) {
       print(as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
       urls <- reddit_urls(sub, 
                           as.POSIXct(d, origin = "1970-01-01", tz = "UTC"),
                           as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
-      content <- reddit_content2(URLencode(urls[[1]]$full_link))
-      saveData(db_name, sub, content)
-      print("SAVED")
+      if (length(urls)!=0){
+        content <- reddit_content2(URLencode(urls[[1]]$full_link))
+        saveData(db_name, sub, content)
+        print("SAVED")
+      }
+      pb$tick()
     }
   }
-  
 }
 
-ETL("reddit", "stocks", lubridate::ymd_hms("2020-12-21 00:00:00"), lubridate::ymd_hms("2020-12-31 00:00:00"))
+ETL("reddit", c("wallstreetbets"), lubridate::ymd_hms("2020-11-01 00:00:00"), lubridate::ymd_hms("2021-06-20 00:00:00"))
