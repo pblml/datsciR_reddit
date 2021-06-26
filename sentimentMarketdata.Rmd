@@ -71,8 +71,9 @@ dat_tmp <- dat %>%
 ```
 
 ```{r}
+symbol <- "GME"
 fig1 <- l.out$df.tickers %>%
-  filter(ticker=="PLTR") %>%
+  filter(ticker==symbol) %>%
   plot_ly(x = ~ref.date, type="candlestick",
           open = ~price.open, close = ~price.close,
           high = ~price.high, low = ~price.low) %>%
@@ -84,15 +85,18 @@ ay <- list(
 )
 
 fig2 <- dat_tmp %>%
-  filter(ticker=="PLTR") %>%
+  filter(ticker==symbol) %>%
   plot_ly() %>%
-  add_trace(x=~date, y=~sentiment, name="sentiment", type="scatter", line=list(color="#00000"), mode="line") %>%
-  add_trace(x=~date, y=~vol_sentiment, name="vol_sentiment", type="bar",yaxis="y2") %>%
-  layout(yaxis2 = ay)
+  add_trace(x=~date, y=~sentiment, name="sentiment", type="scatter", line=list(color="#00000"), mode="line")
+
+fig3 <- dat_tmp %>%
+  filter(ticker==symbol) %>%
+  plot_ly() %>%
+  add_trace(x=~date, y=~vol_sentiment, name="vol_sentiment", type="bar")
 
 
 
-subplot(fig1, fig2, nrows=2)
+subplot(fig1, fig2, fig3, nrows=3, shareX = T)
 ```
 
 
