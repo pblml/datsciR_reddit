@@ -180,9 +180,7 @@ new_nodes <-transform(nodes, description = description_communities[group])
 colnames(new_nodes)<-c('id','group_id','label','group')
 new_nodes <- subset( new_nodes, select = -group_id )
 
-plotCommunities <-visNetwork(new_nodes, edges)%>%
-  visGroups(groupname = "trump,election,mail", shape = "icon", 
-           icon = list(code = "f0c0", size = 75)) %>%
+plotCommunities <-visNetwork(new_nodes, edges, background="silver")%>%
   visClusteringByGroup(groups = unique(new_nodes$group), label="keywords: ")%>% 
   visInteraction(navigationButtons = TRUE)%>% 
   # visLegend(addNodes = list(
@@ -193,14 +191,16 @@ plotCommunities <-visNetwork(new_nodes, edges)%>%
   #   useGroups = FALSE) %>%
   addFontAwesome() 
 
-library(htmltools)
-browsable(
-  tagList(
-    tags$head(
-      tags$style('div.vis-network{background-color: silver;}')  
-    ),
-    plotCommunities
-  )
-)
+plotCommunities
+
+# library(htmltools)
+# browsable(
+#   tagList(
+#     tags$head(
+#       tags$style('div.vis-network{background-color: silver;}')  
+#     ),
+#     plotCommunities
+#   )
+# )
 ```
 
