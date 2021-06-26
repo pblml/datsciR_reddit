@@ -23,7 +23,7 @@ Load data for a specific subreddit and a time period.
 
 As pre-processing is necessary to exclude the post where the user or author is [deleted]. This users add relations between users that are not real and change the generation of the communities
 
-```{r dataload}
+```{r dataload, echo=FALSE}
 databaseName <- "reddit"
 collectionName <- "stocks"
 initial_time <-"2020-12-23"
@@ -32,8 +32,35 @@ end_time <-"2020-12-24"
 raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
   filter(user!="[deleted]",author!="[deleted]")
 
+deleted_comments <-getDeletedPost(databaseName,collectionName)
+
 head(raw_data)
+
 ```
+Check data with users or authors deteled
+```{r dataAnalysis, echo=FALSE}
+databaseName <- "reddit"
+collectionName <- "stocks"
+#get all the interactions with 
+deleted_comments <-getDeletedPost(databaseName,collectionName)
+colnames(deleted_comments) <- c('dates','deleted_users')
+post_per_day <-getPostPerDay(databaseName,collectionName)
+colnames(post_per_day) <- c('dates','total_comments')
+
+merged_data = merge(x = post_per_day, y = deleted_comments, 
+                    by = "dates", all = TRUE)
+merged_data[is.na(merged_data)] <- 0
+merged_data$percentageLost <- merged_data$deleted_users / merged_data$total_comments
+
+ggplot(data=merged_data, aes(x=dates, y=percentageLost, group=1)) +
+  geom_line()+
+  geom_point()
+
+``` 
+
+
+
+
 
 ## Graph creation
 
@@ -43,7 +70,7 @@ Creation of the undirected graph with the two different interactions:
 
 The weight is determined by the amount or comments between a pair of users 
 
-```{r graphCreation}
+```{r graphCreation, echo=FALSE}
 comments_posts <- raw_data %>%
   filter(!grepl("_",structure)) %>%
   rename(
@@ -101,7 +128,7 @@ visNetwork(nodes, edges)%>%
 ```
 For each community the most common words are extracted
 
-```{r}
+```{r relevantWordsComm, echo=FALSE}
 #function to retrieve the most relevant words for each community
 get_relevant_words_community <- function(community) {
   posts_community <- subset(raw_data,user %in% as.list(communities_lc[[community]])|author %in%
@@ -138,7 +165,7 @@ get_relevant_words_community <- function(community) {
 
 ```
 
-```{r}
+```{r descriptionComm, echo=FALSE}
 description_communities <- rep(NA, length(communities_lc))
 for (i in 1:length(communities_lc)) {
   description_communities[[i]]<- get_relevant_words_community(i)
@@ -153,9 +180,27 @@ new_nodes <-transform(nodes, description = description_communities[group])
 colnames(new_nodes)<-c('id','group_id','label','group')
 new_nodes <- subset( new_nodes, select = -group_id )
 
-visNetwork(new_nodes, edges)%>%
- # visOptions(selectedBy = "group", 
- #             highlightNearest = TRUE) %>%
-  visClusteringByGroup(groups = unique(new_nodes$group), label="keyword: ")
+plotCommunities <-visNetwork(new_nodes, edges)%>%
+  visGroups(groupname = "trump,election,mail", shape = "icon", 
+           icon = list(code = "f0c0", size = 75)) %>%
+  visClusteringByGroup(groups = unique(new_nodes$group), label="keywords: ")%>% 
+  visInteraction(navigationButtons = TRUE)%>% 
+  # visLegend(addNodes = list(
+  #   list(label = "group", shape = "icon", 
+  #        icon = list(code = "f0c0", size = 25)),
+  #   list(label = "user", shape = "icon", 
+  #        icon = list(code = "f007", size = 50, color = "red"))), 
+  #   useGroups = FALSE) %>%
+  addFontAwesome() 
+
+library(htmltools)
+browsable(
+  tagList(
+    tags$head(
+      tags$style('div.vis-network{background-color: silver;}')  
+    ),
+    plotCommunities
+  )
+)
 ```
 
