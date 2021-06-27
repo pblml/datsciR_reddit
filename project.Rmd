@@ -10,10 +10,14 @@ csl: ieee.csl
 ---
 
 # Overview and Motivation
-*overview of the project goals and the motivation for it*
+
+In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place[@RePEc]. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it. 
+ 
+Several interesting questions regarding the influence of these subreddits on the stock market emerge from this event. In this project, we want to detect communities in finance related subreddits and mine their sentiment towards discussed stocks to measure if they either have significant influence on or can predict market movements.
 
 # Related Work 
-*anything related, such as a paper, a website, a newspaper article or something else*
+
+Prediction of market movements in relation to stock prices and volume of traded stocks has been widely studied mainly because it can be used as a tool for  investing in profitable stocks with small risks. The prediction of stock prices has been carried out with different machine learning  techniques [@8212715].
 
 # Initial questions:
 
@@ -22,6 +26,13 @@ csl: ieee.csl
 *How did these questions evolve over the course of the project?*
 
 *What new questions did you consider in the course of your analysis?*
+
+Based on our initial objectives our questions at the beginning of the project were: 
+How can we access subreddit data and store it on a non relational database for analysis? 
+1. How can we create communities inside subreddits and extract the stocks discussed inside each community? 
+2. Is it possible to correlate the sentiment towards the stocks discussed in each 
+3. community to  the stock market related data?
+
 
 # Data
 
