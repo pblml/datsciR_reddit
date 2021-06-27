@@ -4,6 +4,7 @@ output:
   prettydoc::html_pretty:
     theme: architect 
     css: "style.css"
+    toc: true
 bibliography: references.bib
 csl: ieee.csl
 
