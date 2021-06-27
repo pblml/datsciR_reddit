@@ -20,23 +20,30 @@ Prediction of market movements in relation to stock prices and volume of traded 
 
 # Initial Questions
 
-*What questions are you trying to answer?*
-
-*How did these questions evolve over the course of the project?*
-
-*What new questions did you consider in the course of your analysis?*
-
-Based on our initial objectives our questions at the beginning of the project were: 
+Based on the objectives on our proposal, the initial questions that we tried to solve were divided in three aspects of our project, which are data extraction and storage, community detection, sentiment analysis, and correlation between sentiment and stock market information. The questions are as follows: 
  
-1. How can we access subreddit data and store it on a non relational database for analysis?
-2. How can we create communities inside subreddits and extract the stocks discussed inside each community?
-3. Is it possible to correlate the sentiment towards the stocks discussed in each community to  the stock market related data?
+1. How can we create communities inside subreddits and extract the stocks discussed inside each community?
+2. Is it possible to correlate the sentiment towards the stocks discussed in each community to  the stock market related data?
 
+The questions evolved during the first stages of data collecting and research about algorithms for clustering and sentiment analysis. The questions change into more specific and new questions were included. The final questions for the project are:
 
+### 1. How can we identify subcommunities inside subreddit and which measures can be used to evaluate the subcommunities?
+A subreddit is already a big community inside Reddit, which allows the interaction between users. It is important to represent the interaction from the users in order to find relations and smaller clusters from users which we can analyze afterwards.  
+
+### 2. Is it possible to identify stocks that are discussed in each subcommunity and the sentiment related to the stocks in a specific point of time?
+
+### 3. Based on the stocks and sentiments towards them inside the communities, is it possible to find a correlation with the stock prices?
 
 # Data
 
 *source, scraping method, cleanup, storage, etc.*
+
+For this project we have two main sources of data, namely Reddit and Yahoo Finance. 
+
+## Reddit comments
+The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the posts with more than 20 comments. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks"
+
+## Stock data
 
 ## Feature engineering
 
@@ -52,3 +59,5 @@ Based on our initial objectives our questions at the beginning of the project we
 *What did you learn about the data?*
 *How did you answer the questions?*
 *How can you justify your answers?*
+
+# References

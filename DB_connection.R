@@ -50,7 +50,7 @@ saveData <- function(databaseName,collectionName,data) {
   db$insert(data)
 }
 
-
+#get aggregated information of posts that have deleted user or author
 getDeletedPost <- function(databaseName,collectionName) {
   # Connect to the database
   db <- mongo(collection = collectionName,
@@ -63,8 +63,37 @@ getDeletedPost <- function(databaseName,collectionName) {
               ),
               options = ssl_options(weak_cert_validation = TRUE))
   # Filter data
-  #data <- db$find('{"$or": [{"user": "[deleted]"},{"author": "[deleted]"}]}')
   data <- db$aggregate('[{"$match":{"$or": [{"user": "[deleted]"},{"author": "[deleted]"}]}},
+                       {
+                            "$group": {
+                                "_id": {
+                                    "$substr": [
+                                        "$comm_date", 0, 10
+                                    ]
+                                }, 
+                                "total": {
+                                    "$sum": 1
+                                }
+                            }
+                        }
+                       ]')
+  data
+}
+
+#get aggregated information of posts that have deleted user
+getPostDeletedUser <- function(databaseName,collectionName) {
+  # Connect to the database
+  db <- mongo(collection = collectionName,
+              url = sprintf(
+                "mongodb+srv://%s:%s@%s/%s",
+                options()$mongodb$username,
+                options()$mongodb$password,
+                options()$mongodb$host,
+                databaseName
+              ),
+              options = ssl_options(weak_cert_validation = TRUE))
+  # Filter data
+  data <- db$aggregate('[{"$match":{"author": "[deleted]"}},
                        {
                             "$group": {
                                 "_id": {
