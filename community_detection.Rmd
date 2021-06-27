@@ -26,40 +26,25 @@ As pre-processing is necessary to exclude the post where the user or author is [
 ```{r dataload, echo=FALSE}
 databaseName <- "reddit"
 collectionName <- "stocks"
-initial_time <-"2020-12-23"
-end_time <-"2020-12-24"
+initial_time <-"2020-11-03"
+end_time <-"2020-11-07"
 
 raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
-  filter(user!="[deleted]",author!="[deleted]")
+  filter(user!="[deleted]") #,author!="[deleted]"
 
-deleted_comments <-getDeletedPost(databaseName,collectionName)
+#for authors that hava name [deleted] a new name is assigned with the structure "author_number"
+new_authors_names <-raw_data %>%
+  filter(author=="[deleted]") %>%
+  distinct(link) %>%
+  mutate(author_name = paste0("author_",row_number(.)))
+
+raw_data <-raw_data %>%
+  left_join(., new_users, by=c( "link"="link")) %>%
+  mutate(author = ifelse(author == "[deleted]", author_name, author))
 
 head(raw_data)
 
 ```
-Check data with users or authors deteled
-```{r dataAnalysis, echo=FALSE}
-databaseName <- "reddit"
-collectionName <- "stocks"
-#get all the interactions with 
-deleted_comments <-getDeletedPost(databaseName,collectionName)
-colnames(deleted_comments) <- c('dates','deleted_users')
-post_per_day <-getPostPerDay(databaseName,collectionName)
-colnames(post_per_day) <- c('dates','total_comments')
-
-merged_data = merge(x = post_per_day, y = deleted_comments, 
-                    by = "dates", all = TRUE)
-merged_data[is.na(merged_data)] <- 0
-merged_data$percentageLost <- merged_data$deleted_users / merged_data$total_comments
-
-ggplot(data=merged_data, aes(x=dates, y=percentageLost, group=1)) +
-  geom_line()+
-  geom_point()
-
-``` 
-
-
-
 
 
 ## Graph creation
@@ -105,11 +90,12 @@ g %>%
   plot(vertex.label=NA, vertex.color="blue", vertex.size=5)
 ```
 
+
 ##Community creation
 
 Create community with the Louvain community detection algorithm and create a visualization of the graphics with the VisNetwork library. For that purpose the set of nodes are retrieved from the original graph and the community where each user belong is obtained from the communities that are created
 
-```{r community}
+```{r community, echo=FALSE}
 
 lc <- cluster_louvain(g)
 communities_lc <-communities(lc)
@@ -165,31 +151,30 @@ get_relevant_words_community <- function(community) {
 
 ```
 
-```{r descriptionComm, echo=FALSE}
+```{r descriptionComm, echo=FALSE,warning = FALSE}
 description_communities <- rep(NA, length(communities_lc))
 for (i in 1:length(communities_lc)) {
   description_communities[[i]]<- get_relevant_words_community(i)
 }
 description_communities
 
-nodes
+#nodes
 ```
 
-```{r}
+```{r, echo=FALSE}
 new_nodes <-transform(nodes, description = description_communities[group])
 colnames(new_nodes)<-c('id','group_id','label','group')
-new_nodes <- subset( new_nodes, select = -group_id )
+new_nodes <- subset( new_nodes, select = -group_id ) %>%
+    mutate(title = paste0("<p><b>", label,"</b><br>Node !</p>"))
 
 plotCommunities <-visNetwork(new_nodes, edges, background="silver")%>%
+  #visNodes(shape = "icon",icon=list(code = "f007")) %>%
   visClusteringByGroup(groups = unique(new_nodes$group), label="keywords: ")%>% 
+  visNodes(title = as.list(unique(new_nodes$group)))%>%
   visInteraction(navigationButtons = TRUE)%>% 
-  # visLegend(addNodes = list(
-  #   list(label = "group", shape = "icon", 
-  #        icon = list(code = "f0c0", size = 25)),
-  #   list(label = "user", shape = "icon", 
-  #        icon = list(code = "f007", size = 50, color = "red"))), 
-  #   useGroups = FALSE) %>%
-  addFontAwesome() 
+  addFontAwesome()
+
+#plotCommunities$x
 
 plotCommunities
 
@@ -203,4 +188,30 @@ plotCommunities
 #   )
 # )
 ```
+
+
+Check data with users deteled
+
+
+```{r dataAnalysis, echo=FALSE}
+databaseName <- "reddit"
+collectionName <- "stocks"
+#get all the interactions with 
+deleted_comments <-getDeletedPost(databaseName,collectionName)
+colnames(deleted_comments) <- c('dates','deleted_users')
+post_per_day <-getPostPerDay(databaseName,collectionName)
+colnames(post_per_day) <- c('dates','total_comments')
+
+merged_data = merge(x = post_per_day, y = deleted_comments, 
+                    by = "dates", all = TRUE)
+merged_data[is.na(merged_data)] <- 0
+merged_data$percentageLost <- merged_data$deleted_users / merged_data$total_comments
+
+ggplot(data=merged_data, aes(x=dates, y=percentageLost, group=1)) +
+  geom_line()+
+  geom_point()
+
+``` 
+
+
 

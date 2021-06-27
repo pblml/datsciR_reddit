@@ -21,6 +21,8 @@ Several interesting questions regarding the influence of these subreddits on the
 
 Prediction of market movements in relation to stock prices and volume of traded stocks has been widely studied mainly because it can be used as a tool for  investing in profitable stocks with small risks. The prediction of stock prices has been carried out with different machine learning  techniques [@8212715].
 
+
+
 # Initial Questions
 
 *What questions are you trying to answer?*
@@ -30,10 +32,11 @@ Prediction of market movements in relation to stock prices and volume of traded 
 *What new questions did you consider in the course of your analysis?*
 
 Based on our initial objectives our questions at the beginning of the project were: 
-How can we access subreddit data and store it on a non relational database for analysis? 
-1. How can we create communities inside subreddits and extract the stocks discussed inside each community? 
-2. Is it possible to correlate the sentiment towards the stocks discussed in each 
-3. community to  the stock market related data?
+ 
+1. How can we access subreddit data and store it on a non relational database for analysis?
+2. How can we create communities inside subreddits and extract the stocks discussed inside each community?
+3. Is it possible to correlate the sentiment towards the stocks discussed in each community to  the stock market related data?
+
 
 
 # Data
