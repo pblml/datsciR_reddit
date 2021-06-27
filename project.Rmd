@@ -9,4 +9,35 @@ csl: ieee.csl
 
 ---
 
-# Title1
+# Overview and Motivation
+*overview of the project goals and the motivation for it*
+
+# Related Work 
+*anything related, such as a paper, a website, a newspaper article or something else*
+
+# Initial questions:
+
+*What questions are you trying to answer?*
+
+*How did these questions evolve over the course of the project?*
+
+*What new questions did you consider in the course of your analysis?*
+
+# Data
+
+*source, scraping method, cleanup, storage, etc.*
+
+## Feature engineering
+
+# Exploratory data analysis:
+
+*What visualizations did you use to look at your data in different ways?*
+*What are the different machine learning methods you considered?*
+*Justify the decisions you made, and show any major changes to your ideas.*
+*How did you reach these conclusions?*
+
+# Final analysis:
+
+*What did you learn about the data?*
+*How did you answer the questions?*
+*How can you justify your answers?*
