@@ -78,7 +78,6 @@ getDeletedPost <- function(databaseName,collectionName) {
                             }
                         }
                        ]')
-  #data <- db$find('{"user": "[delete]"}')
   data
 }
 
@@ -108,6 +107,29 @@ getPostPerDay <- function(databaseName,collectionName){
       ]')
 }
 
+# function that updates a column.
+# Parameters: 
+# - columnFilter: Name of the column to filter from
+# - valueFilter: Value search on the columnFilter to find one row
+# - newColumnName: name of the column to update information. If the column already exists in the document. The information is updated. Otherwise the column is created
+# - valueNewColumn: Value to include in the new column
+updateDocuments<-function(databaseName,collectionName,columnFilter, valueFilter,newColumnName, valueNewColumn){
+  db <- mongo(collection = collectionName,
+              url = sprintf(
+                "mongodb+srv://%s:%s@%s/%s",
+                options()$mongodb$username,
+                options()$mongodb$password,
+                options()$mongodb$host,
+                databaseName
+              ),
+              options = ssl_options(weak_cert_validation = TRUE))
+  
+  db$update(query=sprintf('{"%s":"%s"}',columnFilter,valueFilter),
+            update=sprintf('{"$set":{"%s":"%s"}}',newColumnName,valueNewColumn))
+}
+
+
+
 databaseName <- "reddit"
 collectionName <- "finance"
 
@@ -115,7 +137,7 @@ collectionName <- "finance"
 #finance <- read.csv(file = '/datasets/reddit_finance/finance/submissions_reddit.csv')
 #store information from csv in database
 #saveData(databaseName,collectionName,raw_data)
-
+#updateDocuments("yahooFinance","ticker_names","Symbol","AACQW","add_col","change")
 
 #load data from database 
 financedb <- loadData(databaseName,collectionName)
