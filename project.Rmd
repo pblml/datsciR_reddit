@@ -1,11 +1,6 @@
 ---
 title: "Analysis of finance-related Reddit Communities"
-output: 
-  prettydoc::html_pretty:
-    theme: architect 
-    css: "style.css"
-    toc: true
-    toc_float: true
+output: rmdformats::readthedown
 bibliography: references.bib
 csl: ieee.csl
 
