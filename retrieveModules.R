@@ -135,9 +135,6 @@ reddit_content2 <- function (URL, wait_time = 2) {
 ETL <- function(db_name, subreddit_vec, start_date, end_date) {
   seq_days <- seq(start_date, end_date, by="1 day")
   for (sub in subreddit_vec){
-    pb <- progress_bar$new(
-      format = sprintf("  %s [:bar] :percent eta: :eta", sub),
-      total = length(length(seq_days)), clear = FALSE, width= 60)
     for (d in seq_days) {
       print(as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
       urls <- reddit_urls(sub, 
@@ -148,9 +145,8 @@ ETL <- function(db_name, subreddit_vec, start_date, end_date) {
         saveData(db_name, sub, content)
         print("SAVED")
       }
-      pb$tick()
     }
   }
 }
 
-ETL("reddit", c("wallstreetbets"), lubridate::ymd_hms("2020-11-01 00:00:00"), lubridate::ymd_hms("2021-06-20 00:00:00"))
+ETL("reddit", c("wallstreetbets"), lubridate::ymd_hms("2020-11-04 00:00:00"), lubridate::ymd_hms("2021-06-20 00:00:00"))
