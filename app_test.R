@@ -7,10 +7,11 @@ server <- function(input, output, session) {
                       label = c("1", "2", "3"), 
                       name = c("first", "second", "third"), 
                       extra = c("info1", "info2", "info3"),
-                      ticker = c("PLTR", "AMZN", "AMZN"))
-  nodes <- nodes %>% mutate(title = paste0('<button id=', id,'_',ticker, '>', ticker, '</button>',
-                                           '<br>',
-                                           '<button id=', id,'_',ticker, '>', ticker, '</button>'))
+                      ticker = c("PLTR", "AMZN", "AMZN")) %>%
+    mutate(title = paste0('<button id=', id,'_',ticker, ' style="background-color: #4CAF50">', ticker, '</button>',
+                          '<br>',
+                          '<button id=', id,'_',ticker, '>', ticker, '</button>'))
+  
   edges <- data.frame(from = c(1,2), to = c(1,3), id = 1:2)
   
   output$network_proxy <- renderVisNetwork({
