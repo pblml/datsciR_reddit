@@ -15,7 +15,7 @@ csl: ieee.csl
 # Related Work 
 *anything related, such as a paper, a website, a newspaper article or something else*
 
-# Initial questions:
+# Initial Questions
 
 *What questions are you trying to answer?*
 
@@ -29,14 +29,14 @@ csl: ieee.csl
 
 ## Feature engineering
 
-# Exploratory data analysis:
+# Exploratory Data Analysis
 
 *What visualizations did you use to look at your data in different ways?*
 *What are the different machine learning methods you considered?*
 *Justify the decisions you made, and show any major changes to your ideas.*
 *How did you reach these conclusions?*
 
-# Final analysis:
+# Final Analysis
 
 *What did you learn about the data?*
 *How did you answer the questions?*
