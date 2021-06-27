@@ -35,7 +35,7 @@ sentiment_by("It's hot outside, but I quite enjoy it. My plants are dying still"
 ```{r}
 dat <- content %>%
   mutate(ticker = stringr::str_match(comment, '[^A-Za-z0-9]*([A-Z]{2,4})[^A-Za-z0-9]*')[,2],
-         sentiment = sentiment_by(get_sentences(comment))$ave_sentiment)
+         sent = sentiment_by(get_sentences(comment))$ave_sentiment)
 head(dat %>% na.omit() %>% select(ticker, sentiment))
 ```
 
