@@ -5,6 +5,7 @@ output:
     theme: architect 
     css: "style.css"
     toc: true
+    toc_float: true
 bibliography: references.bib
 csl: ieee.csl
 
