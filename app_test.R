@@ -8,9 +8,9 @@ server <- function(input, output, session) {
                       name = c("first", "second", "third"), 
                       extra = c("info1", "info2", "info3"),
                       ticker = c("PLTR", "AMZN", "AMZN")) %>%
-    mutate(title = paste0('<button id=', id,'_',ticker, ' style="background-color: #4CAF50">', ticker, '</button>',
+    mutate(label = HTML(paste0('<button id=', id,'_',ticker, ' style="background-color: #4CAF50">', ticker, '</button>',
                           '<br>',
-                          '<button id=', id,'_',ticker, '>', ticker, '</button>'))
+                          '<button id=', id,'_',ticker, '>', ticker, '</button>')))
   
   edges <- data.frame(from = c(1,2), to = c(1,3), id = 1:2)
   
