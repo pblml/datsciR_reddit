@@ -4,6 +4,7 @@ output:
   prettydoc::html_pretty:
     theme: architect 
     css: "style.css"
+    toc: true
 bibliography: references.bib
 csl: ieee.csl
 
@@ -19,7 +20,7 @@ Several interesting questions regarding the influence of these subreddits on the
 
 Prediction of market movements in relation to stock prices and volume of traded stocks has been widely studied mainly because it can be used as a tool for  investing in profitable stocks with small risks. The prediction of stock prices has been carried out with different machine learning  techniques [@8212715].
 
-# Initial questions:
+# Initial Questions
 
 *What questions are you trying to answer?*
 
@@ -40,14 +41,14 @@ How can we access subreddit data and store it on a non relational database for a
 
 ## Feature engineering
 
-# Exploratory data analysis:
+# Exploratory Data Analysis
 
 *What visualizations did you use to look at your data in different ways?*
 *What are the different machine learning methods you considered?*
 *Justify the decisions you made, and show any major changes to your ideas.*
 *How did you reach these conclusions?*
 
-# Final analysis:
+# Final Analysis
 
 *What did you learn about the data?*
 *How did you answer the questions?*
