@@ -14,9 +14,11 @@ Several interesting questions regarding the influence of these subreddits on the
 
 # Related Work 
 
-Prediction of market movements in relation to stock prices and volume of traded stocks has been widely studied mainly because it can be used as a tool for  investing in profitable stocks with small risks. The prediction of stock prices has been carried out with different machine learning  techniques [@8212715].
+Prediction of market movements in relation to stock prices and volume of traded stocks has been widely studied mainly because it can be used as a tool for  investing in profitable stocks with small risks. The prediction of stock prices has been carried out successfully with different machine learning  techniques [@8212715].
 
+In terms of community detection, it is possible to identify communities inside social media platforms. These communities can be roughly defined as a subset of entities that have elements in common, which could be, for example, a topic. In a broader sense, the communities are represented as subgraphs  which can be identified via  community detection methods such as graph partitioning and graph clustering. On [@papadopoulos2012community], a survey of different methods to identify communities in the context of social media.
 
+Lastly, finding correlations between social media interaction and stock market is a complicated task. In this area, [@ruiz2012correlating] presents an exploration between twitter messages and stock-market events related to a group of specific companies. As result, it was possible to find correlations between some features from the messages and the traded volume.
 
 # Initial Questions
 
@@ -41,11 +43,35 @@ A subreddit is already a big community inside Reddit, which allows the interacti
 For this project we have two main sources of data, namely Reddit and Yahoo Finance. 
 
 ## Reddit comments
-The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the posts with more than 20 comments. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks"
+The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the posts with more than 20 comments. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks". 
+
+The structure of the retrieved comments is presented in the following table:
+
+```{r include=FALSE}
+library(kableExtra)
+library(tidyverse)
+```
+
+
+```{r raw_data, echo=FALSE,warning = FALSE}
+source("DB_connection.R")
+
+databaseName <- "reddit"
+collectionName <- "stocks"
+initial_time <-"2020-12-23"
+end_time <-"2020-12-27"
+
+raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time)
+
+kbl(head(raw_data,5)) 
+```
+Each comment contains the information of the content of the comment, user that make the comment, the related post with content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
 
 ## Stock data
 
 ## Feature engineering
+
+### Community detection
 
 # Exploratory Data Analysis
 
