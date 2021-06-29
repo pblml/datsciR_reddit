@@ -5,6 +5,14 @@ bibliography: references.bib
 csl: ieee.csl
 
 ---
+```{r setup include=FALSE}
+library(kableExtra)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(lubridate)
+source("DB_connection.R")
+```
 
 # Overview and Motivation
 
@@ -45,19 +53,12 @@ For this project we have two main sources of data, namely Reddit and Yahoo Finan
 ## Reddit comments
 The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the posts with more than 20 comments. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks". 
 
-The structure of the retrieved comments is presented in the following table:
+**TODO: Pushshift is used to fetch the relevant urls, a modified version of RedditExtractoR::get_reddit is used to fetch the data**  
 
-```{r include=FALSE}
-library(kableExtra)
-library(tidyverse)
-library(ggplot2)
-library(plotly)
-library(lubridate)
-```
+The structure of the retrieved comments is presented in the following table:
 
 
 ```{r raw_data, echo=FALSE,warning = FALSE}
-source("DB_connection.R")
 
 databaseName <- "reddit"
 collectionName <- "stocks"
