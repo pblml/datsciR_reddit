@@ -12,6 +12,8 @@ library(ggplot2)
 library(plotly)
 library(lubridate)
 library(igraph)
+library(visNetwork)
+library(data.table)
 source("DB_connection.R")
 options(dplyr.summarise.inform = FALSE)
 ```
@@ -46,7 +48,7 @@ A subreddit is already a big community inside Reddit, which allows the interacti
 For this question we would like to find strategies that allows us to identify the stocks that are mentioned inside each community and the sentiment (positive, negative or neutral) towards the stocks.
 
 ### 3. Based on the stocks and sentiments towards them inside the communities, is it possible to find a correlation with the stock prices?
-
+Considering the Gamestop event we would like to find out if there are relations between the sentiment that the users express in the subreddit towards a stock with the real stock prices. 
 
 # Data
 
@@ -103,7 +105,7 @@ ggplotly(ggplot(data=merged_data, aes(x=dates)) +
            scale_x_date(date_labels = "%m-%Y"))
 ```
 
-To work around this problem. We deleted all of the comments made by a user that was deleted and renamed the authors based on the post.
+To work around this problem. We deleted all of the comments made by a user that was deleted and renamed the authors based on the post and additionally we stored the subreddit data in a cloud database service [MongoDB Atlas](https://www.mongodb.com/es/cloud/atlas). In this way we can reproduce our results from previous data even if the users change in Reddit.
 
 ## Stock data
 
@@ -270,7 +272,7 @@ execution_time <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
                             theme(legend.background = element_rect(size=0.5, linetype="solid")))
 
 fig <- subplot(modularity, clusterNumber, execution_time, nrows = 3, shareX = TRUE, titleY = TRUE) 
-fig <- fig %>% layout(title = "Clustering algorithms")
+fig <- fig %>% layout(title = "Clustering algorithms",showlegend=TRUE)
          #xaxis = list(domain=list(x=c(0,0.5),y=c(0,0.5))),
          #xaxis2 = list(domain=list(x=c(0,0.5),y=c(0,0.5))),
 #         showlegend=FALSE,showlegend2=FALSE,showlegend3=FALSE)
@@ -278,10 +280,28 @@ fig
 ```
 
 
-In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. 
+In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. Louvain create small amount of cluster in almost all of the cases. This clusters contain in general big amount of users and there are no clusters with just one user for Louvain. In contrast, Infomap generated   
 
 The execution time for the tests was very similar for Label Propagation and Louvain. Whereas the execution time for Infomap is higher and it tends to increase as we process more data. Even though it is possible to find these differences between the execution time, it is not a determinant factor to select the clustering algorithm.  
 
+Considering these tests, we selected Louvain as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm. 
+
+```{r cluster_example}
+#create communities
+lc <- cluster_louvain(g)
+
+# Get nodes and edges for the creation of the visualization of the community
+nodes <-do.call(rbind.data.frame, as.list(V(g)$name)) %>%
+  mutate(group = membership(lc)) %>%
+  rename("id" = 1) %>%
+  mutate(labels = id)
+#get edges from data
+edges <- get.data.frame(g, what= c("edges") )
+
+visNetwork(nodes, edges)%>%
+  visClusteringByGroup(groups = unique(nodes$group), label="cluster: ")%>%
+  visInteraction(navigationButtons = TRUE)
+```
 
 
 # Exploratory Data Analysis

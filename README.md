@@ -1,9 +1,9 @@
-# datsciR_reddit
+# Analysis of finance-related Reddit Communities
 
-* PHILIPP
-  * Find a time and space efficient way to fetch and upload the data
-    * emergency solution multiple machines
-  * get a list of stock handles to filter relevant posts
-  * multinet book
-  * get css working inside the RMD
-  * (Figure out a nice way to render the networks)
+Analysis of communities on the finance related subreddits 'stocks' and 'wallstreetbets' and the correlation between the sentiment of the users toward stocks and their prices. 
+
+URL Website: 
+
+URL Screencast:
+
+URL Process notebook:
