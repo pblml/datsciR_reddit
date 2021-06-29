@@ -133,18 +133,20 @@ Common phrases like "to the moon" or "Congrats and f*** you" , which describes a
 ### Ticker extraction
 
 To find the tickers each comment has mentioned a regular expression is used to identify stock symbols.
+
 ```{r}
 stringr::str_match_all("I bought AMC and BB", '[^A-Za-z0-9]+([A-Z]{2,4})[^A-Za-z0-9]*')[[1]][,2]
 ```
 
 This regex extracts every two to four uppercase letter long sequences if it is lead and followed by a non-alphanumeric character.
+
 Disadvantages of this method in comparison to a fixed dictionary are:
   * False positives like "WSB" for Wallstreetbets or "ETF" for Exchange-traded fund. A remedy to this is an expansion of the regex or a subsequent filter on the most mentioned false positives.
-  * Actual company names are not recognized, so if Gamestop gets mentioned, it is not detected as GME.
+  * Actual company names are not recognized, so if GameStop gets mentioned, it is not detected as GME.
 
 ### Community detection
 
-For the community detection we used the library igraph. The subreddit information was transformed into a graph representation. The nodes represent the users from the subreddit and the edges represent the interaction between the users. The interactions are classified into:
+For the community detection we used the library igraph. The subreddit's information was transformed into a graph representation. Nodes represent the users of the subreddit, while interaction between the users is represented by edges. The interactions are classified into:
 
 **1. Answers to a post:** direct comments to a post. For this case an edge is created between the user and the author of the post
 
