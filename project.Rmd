@@ -102,6 +102,13 @@ To work around this problem. We deleted all of the comments made by a user that 
 
 ## Stock data
 
+To get the market data for the relevant tickers, the package ['quantmod'](https://www.quantmod.com/) is used.
+It takes a list of ticker symbols, a start and an end date and returns the market
+data in a clean format.
+Due to its caching functionality, prices have to be fetched only once, subsequent 
+calls first check if the cached file contains all the relevant data
+
+
 ## Feature engineering
 
 ### Community detection
