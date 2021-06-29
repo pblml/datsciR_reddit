@@ -114,8 +114,6 @@ calls first check if the cached file contains all the relevant data.
 
 ## Feature engineering
 
-### Ticker extraction
-
 ### Sentiment analysis
 
 To examine the correlation between market data and sentiment, this measure has to be extracted from every comment.
@@ -127,9 +125,21 @@ Multiple different approaches are available to get the sentiment of a post, whic
 #### Special Case: Wallstreetbets
 
 Due to the distinguished slang of the wallstreetbets subreddit, the dictionary used for getting the sentiment has to be expanded.
-Phrases like "to the moon" or "Congrats and f*** you" , which describes an extremely positive sentiment but are interpreted as neutral.
+Common phrases like "to the moon" or "Congrats and f*** you" , which describes an extremely positive sentiment but are interpreted as neutral.
 
 **TODO: CODE EXAMPLE**
+
+### Ticker extraction
+
+To find the tickers each comment has mentioned a regular expression is used to identify stock symbols.
+```{r}
+stringr::str_match_all("I bought AMC and BB", '[^A-Za-z0-9]+([A-Z]{2,4})[^A-Za-z0-9]*')[[1]][,2]
+```
+
+This regex extracts every two to four uppercase letter long sequences if it is lead and followed by a non-alphanumeric character.
+Disadvantages of this method in comparison to a fixed dictionary are:
+  * False positives like "WSB" for Wallstreetbets or "ETF" for Exchange-traded fund. A remedy to this is an expansion of the regex or a subsequent filter on the most mentioned false positives.
+  * Actual company names are not recognized, so if Gamestop gets mentioned, it is not detected as GME.
 
 ### Community detection
 
