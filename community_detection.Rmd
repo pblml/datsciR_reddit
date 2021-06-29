@@ -106,6 +106,9 @@ nodes$group =membership(lc)
 colnames(nodes)<-c('id','group')
 nodes$labels = nodes$id
 
+communities <-communities(lc)
+do.call(sum, lapply(communities, function(x) length(x)==1))
+
 edges <- get.data.frame(g, what= c("edges") )
 visNetwork(nodes, edges)%>%
  # visOptions(selectedBy = "group", 

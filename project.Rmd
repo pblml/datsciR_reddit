@@ -213,7 +213,63 @@ g %>%
 
 **Clustering Algorithms: **
 
-For the community detection we considered the algorithms [Louvain](https://en.wikipedia.org/wiki/Louvain_method), [Infomap](https://www.mapequation.org/infomap/) and [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm). Since there is no external information about the communities detected, modularity is used to evaluate the quality of the clustering. 
+For the community detection we considered the algorithms [Louvain](https://en.wikipedia.org/wiki/Louvain_method), [Infomap](https://www.mapequation.org/infomap/) and [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm). Since there is no external information about the communities detected, modularity is used to evaluate the quality of the clustering. Modularity measures how strong is the community structure generated and it can be defined as "a normalized tradeoff between edges covered by clusters and squared cluster degree sums"[@modularity]
+
+In order to compare the cluster algoritms, we run all of them 4 different sets of data and record the modularity, execution time and number of clusters created. The results from the evaluation is given in the following plots. 
+
+```{r include=FALSE}
+source("cluster_evaluation.R")
+```
+
+
+```{r cluster_evaluation, echo=FALSE, warning=FALSE}
+
+colors <- c("louvain"="darkred","Infomap"="steelblue","Label Propagation"="green")
+
+clusterNumber <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
+           geom_line(aes(y=clusters_louvain, color = "louvain"))+
+           geom_line(aes(y=clusters_infomap, color = "Infomap"))+ 
+           geom_line(aes(y=clusters_lp, color = "Label Propagation"))+
+           labs(
+             x = "Number of comments",
+             y = "Number of clusters",
+             color = "Algorithm")+
+           scale_color_manual(values = colors)+
+           theme(legend.background = element_rect(size=0.5, linetype="solid")))
+
+execution_time <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
+                          geom_line(aes(y=exec_time_louvain, color = "louvain"))+
+                          geom_line(aes(y=exec_time_infomap, color = "Infomap"))+ 
+                          geom_line(aes(y=exec_time_lp, color = "Label Propagation"))+
+                          labs(
+                            x = "Number of comments",
+                            y = "Execution time",
+                            color = "Algorithm")+
+                          scale_color_manual(values = colors)+
+                          theme(legend.background = element_rect(size=0.5, linetype="solid")))
+
+modularity <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
+                            geom_line(aes(y=modularity_louvain, color = "louvain"))+
+                            geom_line(aes(y=modularity_infomap, color = "Infomap"))+ 
+                            geom_line(aes(y=modularity_lp, color = "Label Propagation"))+
+                            labs(
+                              x = "Number of comments",
+                              y = "Modularity",
+                              color = "Algorithm")+
+                            scale_color_manual(values = colors)+
+                            theme(legend.background = element_rect(size=0.5, linetype="solid")))
+clusterNumber
+execution_time
+modularity
+
+```
+
+
+In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. 
+
+The execution time for the tests was really similar for Label Propagation and Louvain. Whereas the execution time for Infomap is high and it tends to increase as we process more data. 
+
+
 
 # Exploratory Data Analysis
 
