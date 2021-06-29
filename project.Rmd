@@ -5,13 +5,15 @@ bibliography: references.bib
 csl: ieee.csl
 
 ---
-```{r setup include=FALSE}
+```{r setup, include=FALSE}
 library(kableExtra)
 library(tidyverse)
 library(ggplot2)
 library(plotly)
 library(lubridate)
+library(igraph)
 source("DB_connection.R")
+options(dplyr.summarise.inform = FALSE)
 ```
 
 # Overview and Motivation
@@ -40,9 +42,11 @@ The questions evolved during the first stages of data collecting and research ab
 ### 1. How can we identify subcommunities inside subreddit and which measures can be used to evaluate the subcommunities?
 A subreddit is already a big community inside Reddit, which allows the interaction between users. It is important to represent the interaction from the users in order to find relations and smaller clusters from users which we can analyze afterwards.  
 
-### 2. Is it possible to identify stocks that are discussed in each subcommunity and the sentiment related to the stocks in a specific point of time?
+### 2. Is it possible to identify stocks that are discussed in each subcommunity and the sentiment related to the stocks?
+For this question we would like to find strategies that allows us to identify the stocks that are mentioned inside each community and the sentiment (positive, negative or neutral) towards the stocks.
 
 ### 3. Based on the stocks and sentiments towards them inside the communities, is it possible to find a correlation with the stock prices?
+
 
 # Data
 
@@ -148,15 +152,68 @@ Disadvantages of this method in comparison to a fixed dictionary are:
 
 For the community detection we used the library igraph. The subreddit's information was transformed into a graph representation. Nodes represent the users of the subreddit, while interaction between the users is represented by edges. The interactions are classified into:
 
-**1. Answers to a post:** direct comments to a post. For this case an edge is created between the user and the author of the post
+**1. Answers to a post:** direct comments to a post. For this case an edge is created between the user and the author of the post.
 
 **2. Answer to a comment:** comments made as answer to other comments. For this case an edge is created between two users and it requires to use the hierarchy of comments to find the proper connection.
 
+The weight of the edges is given by the number of interactions between the two users. A visual representation of the graph created by the comments between the dates 2020-11-03 and 2020-11-06 for the subreddit stocks is as follows: 
+
+```{r graphcreation, echo=FALSE ,warning = FALSE}
+
+initial_time <-"2020-11-03"
+end_time <-"2020-11-07"
+
+raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
+  filter(user!="[deleted]")
+
+#for authors that have name [deleted] a new name is assigned with the structure "author_number"
+new_authors_names <-raw_data %>%
+  filter(author=="[deleted]") %>%
+  distinct(link) %>%
+  mutate(author_name = paste0("author_",row_number(.)))
+
+raw_data <-raw_data %>%
+  left_join(., new_authors_names, by=c( "link"="link")) %>%
+  mutate(author = ifelse(author == "[deleted]", author_name, author))
+
+#create dataframe with information about direct comments to posts and nested comments
+comments_posts <- raw_data %>%
+  filter(!grepl("_",structure)) %>%
+  rename(
+    from = user,
+    to = author
+  )%>%
+  subset( select = c(from,to))
+
+nested_comments <-raw_data %>% 
+  mutate(
+    from = structure,
+    to = gsub("^(.*)_\\d+$", "\\1", structure) 
+  )%>%
+  subset( select = c(user,from,to,link))%>%
+  left_join(., ., by=c( "link"="link","from"="to")) %>% 
+  drop_na("user.y") %>%
+  select("from"=user.y, "to"=user.x) 
+
+#combination of the connections between reddit users
+connections <-rbind(comments_posts, nested_comments) %>% 
+  filter(from!=to) %>% 
+  group_by(from, to) %>%
+  summarise(weight = n()) %>% 
+  ungroup() %>%
+  mutate(width = weight+5)
+
+#create igraph object
+g <- graph_from_data_frame(connections,directed=FALSE)
+
+g %>%
+  plot(vertex.label=NA, vertex.color="blue", vertex.size=5)
+```
 
 
 **Clustering Algorithms: **
 
-For the community detection we considered the algorithms [Louvain](https://en.wikipedia.org/wiki/Louvain_method), [Infomap](https://www.mapequation.org/infomap/) and [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm). Since there is no external information about the communities detected, modularity is used to evaluate the quality of the clustering
+For the community detection we considered the algorithms [Louvain](https://en.wikipedia.org/wiki/Louvain_method), [Infomap](https://www.mapequation.org/infomap/) and [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm). Since there is no external information about the communities detected, modularity is used to evaluate the quality of the clustering. 
 
 # Exploratory Data Analysis
 

@@ -39,7 +39,7 @@ new_authors_names <-raw_data %>%
   mutate(author_name = paste0("author_",row_number(.)))
 
 raw_data <-raw_data %>%
-  left_join(., new_users, by=c( "link"="link")) %>%
+  left_join(., new_authors_names, by=c( "link"="link")) %>%
   mutate(author = ifelse(author == "[deleted]", author_name, author))
 
 head(raw_data)
