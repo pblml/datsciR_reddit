@@ -2,9 +2,11 @@ library(tidyverse)
 library(tidygraph)
 library(ggraph)
 library(igraph)
+library(tm)
+library(wordcloud)
 source("DB_connection.R")
 
-clustering_evaluation <- function(databaseName,collectionName,initial_time,end_time){
+clustering_evaluation <- function(id_test,databaseName,collectionName,initial_time,end_time){
 
   raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
     filter(user!="[deleted]") 
@@ -69,7 +71,8 @@ clustering_evaluation <- function(databaseName,collectionName,initial_time,end_t
   end_time <- Sys.time()
   time_imc <-end_time - start_time
   
-  result <- data.frame(number_comments = nrow(raw_data), 
+  result <- data.frame(id_test = id_test,
+                       number_comments = nrow(raw_data), 
                        number_posts = length(unique(raw_data$link)),
                        clusters_louvain = length(communities(lc)),
                        clusters_infomap = length(communities(imc)),
@@ -87,13 +90,63 @@ clustering_evaluation <- function(databaseName,collectionName,initial_time,end_t
 
 
 #data selected for evaluation of clusters
-evaluations <- data.frame(collectionName = c("stocks","stocks","wallstreetbets","wallstreetbets"),
-                         initial_time = c("2020-11-03","2020-11-03","2021-01-03","2021-02-03"),
-                         end_time = c("2020-11-07","2020-11-12","2021-01-07","2021-02-05"))
+evaluations <- data.frame(test = 1:4,
+                         collectionName = c("wallstreetbets","stocks","wallstreetbets","stocks"),
+                         initial_time = c("2021-02-03","2020-11-03","2021-01-03","2020-11-03"),
+                         end_time = c("2021-02-05","2020-11-07","2021-01-07","2020-11-12"))
 
 result <-data.frame()
 for(i in 1:nrow(evaluations)) {
   row <- evaluations[i,]
-  result_evaluation <- clustering_evaluation("reddit",row$collectionName,row$initial_time,row$end_time)
+  result_evaluation <- clustering_evaluation(row$test,"reddit",row$collectionName,row$initial_time,row$end_time)
   result <-rbind(result, result_evaluation)
+}
+#update number of comments per test
+evaluations$number_comments <- result$number_comments
+
+
+#Additional functions over generated communities
+generate_term_doc_matrix_community <-function(raw_data,communities,community) {
+  posts_community <- subset(raw_data,user %in% as.list(communities[[community]])|author %in%
+                              as.list(communities[[community]]))
+  single_posts <- unique(posts_community$post_text)
+  TextDoc <- Corpus(VectorSource(c(posts_community$comment,single_posts)))
+  # pre processing of data
+  #Replacing "/", "@" and "|" with space
+  toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+  TextDoc <- tm_map(TextDoc, toSpace, "/")
+  TextDoc <- tm_map(TextDoc, toSpace, "@")
+  TextDoc <- tm_map(TextDoc, toSpace, "\\|")
+  # Convert the text to lower case
+  TextDoc <- tm_map(TextDoc, content_transformer(tolower))
+  # Remove numbers
+  TextDoc <- tm_map(TextDoc, removeNumbers)
+  # Remove english common stopwords
+  TextDoc <- tm_map(TextDoc, removeWords, stopwords("english"))
+  # Remove punctuations
+  TextDoc <- tm_map(TextDoc, removePunctuation)
+  # Eliminate extra white spaces
+  TextDoc <- tm_map(TextDoc, stripWhitespace)
+  
+  # Build a term-document matrix
+  TextDoc_dtm <- TermDocumentMatrix(TextDoc)
+  dtm_m <- as.matrix(TextDoc_dtm)
+  # Sort by descearing value of frequency
+  dtm_v <- sort(rowSums(dtm_m),decreasing=TRUE)
+  dtm_d <- data.frame(word = names(dtm_v),freq=dtm_v)
+  return(dtm_d)
+}
+
+get_relevant_words_community <- function(raw_data,communities,community) {
+  dtm_d <-generate_term_doc_matrix_community(raw_data,communities,community)
+  relevant_words <- paste(head(dtm_d, 3)$word,collapse=', ')
+  return(relevant_words)
+}
+
+get_word_cloud_community <- function(raw_data,communities,community) {
+  dtm_d <-generate_term_doc_matrix_community(raw_data,communities,community)
+  set.seed(1234)
+  wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 1,           
+                         max.words=50, random.order=FALSE, rot.per=0.35,            
+                         colors=brewer.pal(8, "Dark2"),scale=c(5, .2))
 }

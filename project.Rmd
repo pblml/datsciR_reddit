@@ -73,7 +73,7 @@ end_time <-"2020-12-27"
 
 raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time)
 
-kbl(head(raw_data,5)) 
+kbl(head(raw_data,3)) 
 ```
 Each comment contains the information of the content of the comment, user that make the comment, the related post with content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
 
@@ -216,8 +216,8 @@ g %>%
 **Clustering Algorithms: **
 
 For the community detection we considered the algorithms [Louvain](https://en.wikipedia.org/wiki/Louvain_method), [Infomap](https://www.mapequation.org/infomap/) and [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm). Since there is no external information about the communities detected, modularity is used to evaluate the quality of the clustering. Modularity measures how strong is the community structure generated and it can be defined as "a normalized tradeoff between edges covered by clusters and squared cluster degree sums"[@modularity]
-
-In order to compare the cluster algorithms, we run all of them 4 different sets of data and record the modularity, execution time and number of clusters created. The results from the evaluation is given in the following plots. 
+s
+In order to compare the cluster algorithms, we run all of them 4 different samples of the data as shown in the following table. We used both subreddits wallstreetbets and stocks and have different sizes on samples. With this test we recorded the modularity, execution time and number of clusters created. The results from the evaluation are given in the following plots. 
 
 ```{r include=FALSE}
 source("cluster_evaluation.R")
@@ -225,62 +225,62 @@ source("cluster_evaluation.R")
 
 
 ```{r cluster_evaluation, echo=FALSE, warning=FALSE}
+kbl(evaluations,
+    col.names = c("Test",
+                  "Collection Name",
+                  "Initial Date",
+                  "Final Date",
+                  "Sample size"),
+    caption = "Test samples")
 
-colors <- c("louvain"="darkred","Infomap"="steelblue","Label Propagation"="green")
+modularity_clusters <- result %>%
+  select(c("id_test","modularity_louvain","modularity_infomap","modularity_lp"))%>%
+  melt(id.vars = "id_test", variable.name = "Algorithm",
+       value.name="modularity")
 
-modularity <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
-                            geom_line(aes(y=modularity_louvain, color = "louvain"))+
-                            geom_line(aes(y=modularity_infomap, color = "Infomap"))+ 
-                            geom_line(aes(y=modularity_lp, color = "Label Propagation"))+
-                            labs(
-                              x = "Number of comments",
-                              y = "Modularity",
-                              color = "Algorithm")+
-                            scale_color_manual(values = colors)+
-                            theme(legend.background = element_rect(size=0.5, linetype="solid")))
+ggplotly(ggplot(data=modularity_clusters, aes(x=id_test))+
+           geom_bar(aes(y=modularity,fill=Algorithm), 
+                    stat = "identity", position = "dodge")+
+           labs( x = "Test",
+                 y = "Modularity"))
 
-clusterNumber <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
-           geom_line(aes(y=clusters_louvain, color = "louvain"))+
-           geom_line(aes(y=clusters_infomap, color = "Infomap"))+ 
-           geom_line(aes(y=clusters_lp, color = "Label Propagation"))+
-           labs(
-             x = "Number of comments",
-             y = "Number of clusters",
-             color = "Algorithm")+
-           scale_color_manual(values = colors)+
-           theme(legend.background = element_rect(size=0.5, linetype="solid")))
-
-df <- result %>%
-  select(c("number_comments","clusters_louvain","clusters_infomap","clusters_lp",
-           "clusters_1_louvain","clusters_1_lp","clusters_1_infomap"))%>%
-  melt(id.vars = "number_comments", variable.name = "method",
-       value.name="number_clusters")
-
-clusterNumber <-ggplotly(ggplot(data=df, aes(x=number_comments))+
-                           geom_bar(aes(y=number_clusters,fill=method), 
-                                    stat = "identity", position = "dodge"))
-
-execution_time <- ggplotly(ggplot(data=result, aes(x=number_comments)) +
-                          geom_line(aes(y=exec_time_louvain, color = "louvain"))+
-                          geom_line(aes(y=exec_time_infomap, color = "Infomap"))+ 
-                          geom_line(aes(y=exec_time_lp, color = "Label Propagation"))+
-                          labs(
-                            x = "Number of comments",
-                            y = "time (seconds)",
-                            color = "Algorithm")+
-                          scale_color_manual(values = colors)+
-                            theme(legend.background = element_rect(size=0.5, linetype="solid")))
-
-fig <- subplot(modularity, clusterNumber, execution_time, nrows = 3, shareX = TRUE, titleY = TRUE) 
-fig <- fig %>% layout(title = "Clustering algorithms",showlegend=TRUE)
-         #xaxis = list(domain=list(x=c(0,0.5),y=c(0,0.5))),
-         #xaxis2 = list(domain=list(x=c(0,0.5),y=c(0,0.5))),
-#         showlegend=FALSE,showlegend2=FALSE,showlegend3=FALSE)
-fig
 ```
 
 
-In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. Louvain create small amount of cluster in almost all of the cases. This clusters contain in general big amount of users and there are no clusters with just one user for Louvain. In contrast, Infomap generated   
+In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. 
+
+
+```{r number_clusters, echo=FALSE, warning=FALSE}
+
+cluster_numbers <- result %>%
+  select(c("id_test","clusters_louvain","clusters_infomap","clusters_lp",
+           "clusters_1_louvain","clusters_1_lp","clusters_1_infomap"))%>%
+  melt(id.vars = "id_test", variable.name = "Algorithm",
+       value.name="number_clusters")
+
+ggplotly(ggplot(data=cluster_numbers, aes(x=id_test))+
+           geom_bar(aes(y=number_clusters,fill=Algorithm), 
+                    stat = "identity", position = "dodge")+
+           labs( x = "Test",
+                 y = "Number Clusters"))
+```
+
+
+Louvain create small number of cluster in almost all of the cases. This clusters contain in general big amount of users and there are no clusters with just one user for Louvain. In contrast, Infomap generated for all of the tests clusters with just one user. In the case of Label propagation just for the first test it generated one cluster with just one user and for the third test, the number of clusters generated was smaller than for Louvain.
+
+```{r echo=FALSE, warning=FALSE}
+time_algorithms <- result %>%
+  select(c("id_test","exec_time_louvain","exec_time_infomap","exec_time_lp"))%>%
+  melt(id.vars = "id_test", variable.name = "Algorithm",
+       value.name="time")
+
+ggplotly(ggplot(data=time_algorithms, aes(x=id_test))+
+           geom_bar(aes(y=as.numeric(time),fill=Algorithm), 
+                    stat = "identity", position = "dodge")+
+           labs( x = "Test",
+                 y = "Execution time (s)"))
+```
+
 
 The execution time for the tests was very similar for Label Propagation and Louvain. Whereas the execution time for Infomap is higher and it tends to increase as we process more data. Even though it is possible to find these differences between the execution time, it is not a determinant factor to select the clustering algorithm.  
 
@@ -303,6 +303,14 @@ visNetwork(nodes, edges)%>%
   visInteraction(navigationButtons = TRUE)
 ```
 
+
+Wordcloud for generated communities:
+
+```{r wordcloud, warning=FALSE}
+par(mfrow=c(1,2))
+get_word_cloud_community(raw_data,communities(lc),1)
+get_word_cloud_community(raw_data,communities(lc),2)
+```
 
 # Exploratory Data Analysis
 

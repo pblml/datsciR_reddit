@@ -7,12 +7,20 @@ source("DB_connection.R")
 databaseName <- "reddit"
 collectionName <- "stocks"
 
-raw_data <- loadDataDates(databaseName,collectionName,"2020-12-23","2020-12-25") %>%
-  filter(user!="[deleted]",author!="[deleted]")
+raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
+  filter(user!="[deleted]")
 
-raw_data <-head(raw_data,500)
+#for authors that have name [deleted] a new name is assigned with the structure "author_number"
+new_authors_names <-raw_data %>%
+  filter(author=="[deleted]") %>%
+  distinct(link) %>%
+  mutate(author_name = paste0("author_",row_number(.)))
 
-#Select the direct comments to a post
+raw_data <-raw_data %>%
+  left_join(., new_users, by=c( "link"="link")) %>%
+  mutate(author = ifelse(author == "[deleted]", author_name, author))
+
+#create dataframe with information about direct comments to posts and nested comments
 comments_posts <- raw_data %>%
   filter(!grepl("_",structure)) %>%
   rename(
@@ -42,13 +50,15 @@ connections <-rbind(comments_posts, nested_comments) %>%
 #First two columns work as edge list and the others as 
 g <- graph_from_data_frame(connections,directed=FALSE)
 
-g
 
 # louvain community detection 
 start_time <- Sys.time()
 lc <- cluster_louvain(g)
 end_time <- Sys.time()
 total_time <-end_time - start_time
+
+g %>%
+  plot(vertex.label=NA, vertex.color="blue", vertex.size=5)
 
 membership(lc)
 communities(lc)
@@ -213,5 +223,4 @@ compare(optimal,cluster_eb)
 
 closeness(g, mode="all")
 ##-------------------------end other algorithms -----------------------------------
-
 
