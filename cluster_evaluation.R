@@ -71,21 +71,24 @@ clustering_evaluation <- function(id_test,databaseName,collectionName,initial_ti
   end_time <- Sys.time()
   time_imc <-end_time - start_time
   
-  result <- data.frame(id_test = id_test,
-                       number_comments = nrow(raw_data), 
-                       number_posts = length(unique(raw_data$link)),
-                       clusters_louvain = length(communities(lc)),
-                       clusters_infomap = length(communities(imc)),
-                       clusters_lp = length(communities(lpc)),
-                       clusters_1_louvain = do.call(sum, lapply(communities(lc), function(x) length(x)==1)),
-                       clusters_1_infomap = do.call(sum, lapply(communities(imc), function(x) length(x)==1)),
-                       clusters_1_lp = do.call(sum, lapply(communities(lpc), function(x) length(x)==1)),
-                       exec_time_louvain = time_louvain,
-                       exec_time_infomap = time_imc,
-                       exec_time_lp = time_lpc, 
-                       modularity_louvain = modularity(lc),
-                       modularity_infomap = modularity(imc),
-                       modularity_lp = modularity(lpc))
+  modularities <- data.frame(id_test = rep(id_test,3),
+                             measure = rep("modularity",3),
+                             algorithm = c("Louvain","Infomap","Label Propagation"),
+                             value = c(modularity(lc),modularity(imc),modularity(lpc)),
+                             clusters_one_user = rep(NA, 3))
+  clusters <- data.frame(id_test = rep(id_test,3),
+                         measure = rep("clusters",3),
+                         algorithm = c("Louvain","Infomap","Label Propagation"),
+                         value = c(length(communities(lc)),length(communities(imc)),length(communities(lpc))),
+                         clusters_one_user = c(do.call(sum, lapply(communities(lc), function(x) length(x)==1)),
+                                               do.call(sum, lapply(communities(imc), function(x) length(x)==1)),
+                                               do.call(sum, lapply(communities(lpc), function(x) length(x)==1))))
+  time <- data.frame(id_test = rep(id_test,3),
+                     measure = rep("time",3),
+                     algorithm = c("Louvain","Infomap","Label Propagation"),
+                     value = c(as.numeric(time_louvain),as.numeric(time_imc),as.numeric(time_lpc)),
+                     clusters_one_user = rep(NA, 3))
+  result <- list(df=rbind(modularities,clusters,time),number_comments =nrow(raw_data))
 }
 
 
@@ -93,16 +96,17 @@ clustering_evaluation <- function(id_test,databaseName,collectionName,initial_ti
 evaluations <- data.frame(test = 1:4,
                          collectionName = c("wallstreetbets","stocks","wallstreetbets","stocks"),
                          initial_time = c("2021-02-03","2020-11-03","2021-01-03","2020-11-03"),
-                         end_time = c("2021-02-05","2020-11-07","2021-01-07","2020-11-12"))
+                         end_time = c("2021-02-05","2020-11-07","2021-01-07","2020-11-12"),
+                         number_comments = rep(NA, 4))
 
 result <-data.frame()
 for(i in 1:nrow(evaluations)) {
   row <- evaluations[i,]
   result_evaluation <- clustering_evaluation(row$test,"reddit",row$collectionName,row$initial_time,row$end_time)
-  result <-rbind(result, result_evaluation)
+  #update number of comments per test
+  evaluations[[i,"number_comments"]]<-result_evaluation$number_comments
+  result <-rbind(result, result_evaluation$df)
 }
-#update number of comments per test
-evaluations$number_comments <- result$number_comments
 
 
 #Additional functions over generated communities

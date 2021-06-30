@@ -122,6 +122,37 @@ getPostPerDay <- function(databaseName,collectionName){
               options = ssl_options(weak_cert_validation = TRUE))
   data <- db$aggregate('[
           {
+                  "$group": {
+                      "_id": {
+                          "data":{"$substr": [
+                              "$comm_date", 0, 10
+                          ]},
+                          "link":"$link"
+                      }, 
+                      "total": {
+                          "$sum": 1
+                      }
+                  }
+              }
+          ]')
+  data <- do.call(data.frame,data) %>%
+    group_by(X_id.data) %>%
+    summarise(nr_post = n())
+}
+
+#get number of comments per day
+getCommentsPerDay <- function(databaseName,collectionName){
+  db <- mongo(collection = collectionName,
+              url = sprintf(
+                "mongodb+srv://%s:%s@%s/%s",
+                options()$mongodb$username,
+                options()$mongodb$password,
+                options()$mongodb$host,
+                databaseName
+              ),
+              options = ssl_options(weak_cert_validation = TRUE))
+  data <- db$aggregate('[
+          {
               "$group": {
                   "_id": {
                       "$substr": [
@@ -160,7 +191,7 @@ updateDocuments<-function(databaseName,collectionName,columnFilter, valueFilter,
 
 
 databaseName <- "reddit"
-collectionName <- "finance"
+collectionName <- "stocks"
 
 #read data from test data
 #finance <- read.csv(file = '/datasets/reddit_finance/finance/submissions_reddit.csv')
@@ -169,4 +200,4 @@ collectionName <- "finance"
 #updateDocuments("yahooFinance","ticker_names","Symbol","AACQW","add_col","change")
 
 #load data from database 
-financedb <- loadData(databaseName,collectionName)
+#financedb <- loadData(databaseName,collectionName)

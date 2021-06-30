@@ -13,7 +13,6 @@ library(plotly)
 library(lubridate)
 library(igraph)
 library(visNetwork)
-library(data.table)
 source("DB_connection.R")
 options(dplyr.summarise.inform = FALSE)
 ```
@@ -52,7 +51,6 @@ Considering the Gamestop event we would like to find out if there are relations 
 
 # Data
 
-*source, scraping method, cleanup, storage, etc.*
 
 For this project we have two main sources of data, namely Reddit and Yahoo Finance. 
 
@@ -87,7 +85,7 @@ deleted_comments <-getPostDeletedUser(databaseName,collectionName)
 colnames(deleted_comments) <- c('dates','deleted_users')
 deletedUsers_Authors <-getDeletedPost(databaseName,collectionName)
 colnames(deletedUsers_Authors) <- c('dates','deleted_auth_users')
-post_per_day <-getPostPerDay(databaseName,collectionName)
+post_per_day <-getCommentsPerDay(databaseName,collectionName)
 colnames(post_per_day) <- c('dates','total_comments')
 
 merged_data <- merge(x = post_per_day, y = deleted_comments, 
@@ -234,12 +232,10 @@ kbl(evaluations,
     caption = "Test samples")
 
 modularity_clusters <- result %>%
-  select(c("id_test","modularity_louvain","modularity_infomap","modularity_lp"))%>%
-  melt(id.vars = "id_test", variable.name = "Algorithm",
-       value.name="modularity")
+  filter(measure == "modularity") 
 
 ggplotly(ggplot(data=modularity_clusters, aes(x=id_test))+
-           geom_bar(aes(y=modularity,fill=Algorithm), 
+           geom_bar(aes(y=value,fill=algorithm), 
                     stat = "identity", position = "dodge")+
            labs( x = "Test",
                  y = "Modularity"))
@@ -253,16 +249,14 @@ In terms of modularity, Louvain performed better than Infomap and Label Propagat
 ```{r number_clusters, echo=FALSE, warning=FALSE}
 
 cluster_numbers <- result %>%
-  select(c("id_test","clusters_louvain","clusters_infomap","clusters_lp",
-           "clusters_1_louvain","clusters_1_lp","clusters_1_infomap"))%>%
-  melt(id.vars = "id_test", variable.name = "Algorithm",
-       value.name="number_clusters")
+  filter(measure == "clusters")
 
 ggplotly(ggplot(data=cluster_numbers, aes(x=id_test))+
-           geom_bar(aes(y=number_clusters,fill=Algorithm), 
+           geom_bar(aes(y=value,fill=algorithm), 
                     stat = "identity", position = "dodge")+
            labs( x = "Test",
                  y = "Number Clusters"))
+
 ```
 
 
@@ -270,12 +264,10 @@ Louvain create small number of cluster in almost all of the cases. This clusters
 
 ```{r echo=FALSE, warning=FALSE}
 time_algorithms <- result %>%
-  select(c("id_test","exec_time_louvain","exec_time_infomap","exec_time_lp"))%>%
-  melt(id.vars = "id_test", variable.name = "Algorithm",
-       value.name="time")
+  filter(measure == "time")
 
 ggplotly(ggplot(data=time_algorithms, aes(x=id_test))+
-           geom_bar(aes(y=as.numeric(time),fill=Algorithm), 
+           geom_bar(aes(y=value,fill=algorithm), 
                     stat = "identity", position = "dodge")+
            labs( x = "Test",
                  y = "Execution time (s)"))
@@ -313,6 +305,14 @@ get_word_cloud_community(raw_data,communities(lc),2)
 ```
 
 # Exploratory Data Analysis
+
+Information about comments and posts per day for both subreddits
+```{r}
+comments_per_day_stocks <-getCommentsPerDay(databaseName,"stocks")
+post_per_day_stocks <- getPostPerDay(databaseName,"stocks")
+comments_per_day_wallstreetbets <-getCommentsPerDay(databaseName,"wallstreetbets")
+post_per_day_wallstreetbets <- getPostPerDay(databaseName,"wallstreetbets")
+```
 
 *What visualizations did you use to look at your data in different ways?*
 *What are the different machine learning methods you considered?*
