@@ -6,8 +6,8 @@ library(tm)
 library(wordcloud)
 source("DB_connection.R")
 
-clustering_evaluation <- function(id_test,databaseName,collectionName,initial_time,end_time){
-
+#create an igraph representation of a subreddit in a timeframe
+create_subreddit_graph <- function(databaseName,collectionName,initial_time,end_time){
   raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
     filter(user!="[deleted]") 
   
@@ -50,6 +50,14 @@ clustering_evaluation <- function(id_test,databaseName,collectionName,initial_ti
   #create igraph object
   #First two columns work as edge list and the others as 
   g <- graph_from_data_frame(connections,directed=FALSE)
+  g
+}
+
+
+#evaluate different clustering algorithms
+clustering_evaluation <- function(id_test,databaseName,collectionName,initial_time,end_time){
+
+  g <-create_subreddit_graph(databaseName,collectionName,initial_time,end_time)
   
   #execute clustering algorithms
   #louvain
@@ -101,6 +109,7 @@ evaluations <- data.frame(test = 1:4,
 
 result <-data.frame()
 for(i in 1:nrow(evaluations)) {
+  print(i)
   row <- evaluations[i,]
   result_evaluation <- clustering_evaluation(row$test,"reddit",row$collectionName,row$initial_time,row$end_time)
   #update number of comments per test
@@ -141,16 +150,32 @@ generate_term_doc_matrix_community <-function(raw_data,communities,community) {
   return(dtm_d)
 }
 
+
+get_word_cloud_community <- function(raw_data,communities,community) {
+  dtm_d <-generate_term_doc_matrix_community(raw_data,communities,community)
+  set.seed(1234)
+  wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 1,           
+             max.words=50, random.order=FALSE, rot.per=0.35,
+             colors=brewer.pal(8, "Dark2"),scale=c(5, .2))
+  #wc <-wordcloud2(dtm_d)
+  #wc
+}
+
+#retrieve the 3 more common words in a community. As input it expects the raw data that generated the communities, 
+#the communities object and the number of the community
 get_relevant_words_community <- function(raw_data,communities,community) {
   dtm_d <-generate_term_doc_matrix_community(raw_data,communities,community)
   relevant_words <- paste(head(dtm_d, 3)$word,collapse=', ')
   return(relevant_words)
 }
 
-get_word_cloud_community <- function(raw_data,communities,community) {
-  dtm_d <-generate_term_doc_matrix_community(raw_data,communities,community)
-  set.seed(1234)
-  wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 1,           
-            max.words=50, random.order=FALSE, rot.per=0.35,
-            colors=brewer.pal(8, "Dark2"),scale=c(5, .2))
+#create interactive communities
+create_communities_visualization <- function(collectionName, collectionClusters, initial_date, final_date){
+  #create graph representation
+  g <-create_subreddit_graph(id_test,databaseName,collectionName,initial_time,end_time)
+  #create communities
+  communities <- cluster_louvain(g)
+  #get relevant words for each community
+  #get nodes and edges
+  #create VisNetwork representation
 }

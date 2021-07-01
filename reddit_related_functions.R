@@ -21,8 +21,7 @@ get_info_deleted_users <- function(collectionName){
   merged_data
 }
 
-#create communities in reddits
-#create_communities_subreddits("stocks","clusters_stocks")
+#create communities in complete reddits and store information back in the database
 create_communities_subreddits <- function(collectionName, collectionClusters){
   databaseName <- "reddit"
   raw_data <-loadData(databaseName,collectionName)%>%
@@ -76,3 +75,7 @@ create_communities_subreddits <- function(collectionName, collectionClusters){
   saveData(databaseName,collectionClusters,users)
   users
 }
+
+#create_communities_subreddits("stocks","clusters_stocks")
+#create_communities_subreddits("wallstreetbets","clusters_wallstreetbets")
+

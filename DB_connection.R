@@ -111,6 +111,7 @@ getNumberPostDeletedAuthors <- function(databaseName,collectionName) {
   data
 }
 
+
 getPostPerDay <- function(databaseName,collectionName){
   db <- mongo(collection = collectionName,
               url = sprintf(
