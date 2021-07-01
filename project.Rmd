@@ -13,6 +13,8 @@ library(plotly)
 library(lubridate)
 library(igraph)
 library(visNetwork)
+library(BatchGetSymbols)
+library(scales)
 source("DB_connection.R")
 options(dplyr.summarise.inform = FALSE)
 ```
@@ -87,16 +89,26 @@ wallstreetbets_comments <-get_info_deleted_users("wallstreetbets")
 
 
 ggplotly(ggplot(data=stock_comments, aes(x=dates)) +
-           geom_line(aes(y=percentage_comments_del_users), color="darkred")+
-           geom_line(aes(y=percentage_comments_del_authors), color="steelblue")+ 
+           geom_line(aes(y=percentage_comments_del_users, colour="Users"))+
+           geom_line(aes(y=percentage_comments_del_authors, colour="Authors"))+ 
+           scale_color_manual(name = "Deleted  object",values = c(
+             'Users' = 'darkred',
+             'Authors' = 'steelblue'))+
            scale_x_date(date_labels = "%m-%Y")+
-           labs(title="Proportion of missing comments due to deleted users subreddit Stocks"))
+           labs(title="Proportion of missing comments due to deleted users subreddit Stocks",
+                x = "Date",
+                y = "Proportion of comments with deleted user/author"))
 
 ggplotly(ggplot(data=wallstreetbets_comments, aes(x=dates)) +
-           geom_line(aes(y=percentage_comments_del_users), color="darkred")+
-           geom_line(aes(y=percentage_comments_del_authors), color="steelblue")+ 
+           geom_line(aes(y=percentage_comments_del_users, colour="Users"))+
+           geom_line(aes(y=percentage_comments_del_authors, colour="Authors"))+ 
+           scale_color_manual(name = "Deleted  object",values = c(
+             'Users' = 'darkred',
+             'Authors' = 'steelblue'))+ 
            scale_x_date(date_labels = "%m-%Y")+
-           labs(title="Proportion of missing comments due to deleted users subreddit Wallstreetbets"))
+           labs(title="Proportion of missing comments due to deleted users subreddit Wallstreetbets",
+                x = "Date",
+                y = "Proportion of comments with deleted user/author"))
 ```
 
 To work around this problem. We deleted all of the comments made by a user that was deleted and renamed the authors based on the post and additionally we stored the subreddit data in a cloud database service [MongoDB Atlas](https://www.mongodb.com/es/cloud/atlas). In this way we can reproduce our results from previous data even if the users change in Reddit.
@@ -108,6 +120,17 @@ It takes a list of ticker symbols, a start and an end date and returns the marke
 data in a clean format.
 
 **TODO: CODE EXAMPLE**
+```{r stockDataExample }
+tickers <- c("GME","TSLA","AMC")
+l.out <- BatchGetSymbols(tickers = tickers, 
+                         first.date = lubridate::ymd_hms("2021-06-07 00:00:00"),
+                         last.date = lubridate::ymd_hms("2021-06-10 00:00:00"), 
+                         freq.data = "daily",
+                         cache.folder = file.path(tempdir(), 
+                                                  'BGS_Cache'))
+kbl(l.out$df.tickers)
+```
+
 
 Due to its caching functionality, prices have to be fetched only once, subsequent 
 calls first check if the cached file contains all the relevant data.
@@ -309,12 +332,88 @@ get_word_cloud_community(raw_data,communities(lc),2)
 # Exploratory Data Analysis
 
 Information about comments and posts per day for both subreddits
-```{r}
-comments_per_day_stocks <-getCommentsPerDay(databaseName,"stocks")
-post_per_day_stocks <- getPostPerDay(databaseName,"stocks")
-comments_per_day_wallstreetbets <-getCommentsPerDay(databaseName,"wallstreetbets")
-post_per_day_wallstreetbets <- getPostPerDay(databaseName,"wallstreetbets")
+```{r post_comments_subreddits }
+comments_per_day_stocks <-getCommentsPerDay(databaseName,"stocks") %>%
+  mutate(subreddit = "Stocks")
+comments_per_day_wallstreetbets <-getCommentsPerDay(databaseName,"wallstreetbets") %>%
+  mutate(subreddit = "Wallstreetbets") %>%
+  rbind(.,comments_per_day_stocks) %>%
+  rename(date='_id')%>%
+  mutate(dayWeek = weekdays(as.Date(date)),
+         cw = strftime(date, format = "%V"))
+
+#change date format
+comments_per_day_wallstreetbets$date <- ymd(comments_per_day_wallstreetbets$date)
+
+
+ggplotly(ggplot(data=comments_per_day_wallstreetbets, aes(x=date)) +
+           geom_line(aes(y=total, color=subreddit))+
+           scale_x_date(date_labels = "%m-%Y")+
+           labs(title="Comments per day",
+                x = "Date",
+                y = "Comments"))
+
+
+post_per_day_stocks <- getPostPerDay(databaseName,"stocks") %>%
+  mutate(subreddit = "Stocks")
+post_per_day_wallstreetbets <- getPostPerDay(databaseName,"wallstreetbets")%>%
+  mutate(subreddit = "Wallstreetbets") %>%
+  rbind(.,post_per_day_stocks) %>%
+  rename(date=X_id.data) 
+
+week_analysis <- post_per_day_wallstreetbets %>%
+  group_by(subreddit,cw)%>%
+  summarise(count = sum(nr_posts))
+  
+
+post_per_day_wallstreetbets$date <- ymd(post_per_day_wallstreetbets$date)
+
+ggplotly(ggplot(data=post_per_day_wallstreetbets, aes(x=date)) +
+           geom_line(aes(y=nr_post, color=subreddit))+
+           scale_x_date(date_labels = "%m-%Y")+
+           labs(title="Posts per day",
+                x = "Date",
+                y = "Comments"))
+
 ```
+
+User participation in reddits:
+
+```{r}
+active_users <-merge(getActiveUsers("stocks"),
+                  getActiveUsers("wallstreetbets"), 
+                  by='_id', all = TRUE) %>%
+  rename(comments_stocks = comments.x, comments_wsb = comments.y, name_user = '_id') %>% 
+  replace_na(list(comments_stocks = 0, comments_wsb = 0)) %>%
+  filter(name_user!="[deleted]") %>%
+  mutate(participation = comments_stocks - comments_wsb) %>%
+  mutate(subreddit = ifelse(participation>0,"stocks","wallstreetbets")) %>%
+  mutate(type_participation = ifelse(comments_stocks>0 & comments_wsb>0,"Both subreddits",
+                         ifelse(comments_stocks>0,"Stocks","Wallstreetbets")))
+
+ggplot(active_users, aes(x=participation)) + geom_histogram(bins = 50)
+
+summary_users <- active_users %>%
+  group_by(type_participation) %>%
+  summarise(prop=(n()/nrow(active_users))*100)
+
+ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar(theta="y") + 
+  scale_fill_brewer(palette="Blues")+
+  theme_minimal()+
+  theme(panel.grid=element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title=element_text(size=14, face="bold"))+
+  geom_text(aes(y = prop/7 + c(0, cumsum(prop)[-length(prop)]), 
+                label = percent(prop/100)), size=5)
+```
+
+
 
 *What visualizations did you use to look at your data in different ways?*
 *What are the different machine learning methods you considered?*

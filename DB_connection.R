@@ -189,16 +189,26 @@ updateDocuments<-function(databaseName,collectionName,columnFilter, valueFilter,
             update=sprintf('{"$set":{"%s":"%s"}}',newColumnName,valueNewColumn))
 }
 
+#get active users in a subreddit
+getActiveUsers<- function(collectionName){
+  databaseName <- "reddit"
+  db <- mongo(collection = collectionName,
+              url = sprintf(
+                "mongodb+srv://%s:%s@%s/%s",
+                options()$mongodb$username,
+                options()$mongodb$password,
+                options()$mongodb$host,
+                databaseName
+              ),
+              options = ssl_options(weak_cert_validation = TRUE))
+  active_users <- db$aggregate('[
+          {
+              "$group": {
+                  "_id": "$user", 
+                  "comments": {"$sum": 1}
+              }
+          }
+      ]')
+}
 
 
-databaseName <- "reddit"
-collectionName <- "stocks"
-
-#read data from test data
-#finance <- read.csv(file = '/datasets/reddit_finance/finance/submissions_reddit.csv')
-#store information from csv in database
-#saveData(databaseName,collectionName,raw_data)
-#updateDocuments("yahooFinance","ticker_names","Symbol","AACQW","add_col","change")
-
-#load data from database 
-#financedb <- loadData(databaseName,collectionName)
