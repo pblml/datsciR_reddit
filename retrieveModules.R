@@ -1,7 +1,8 @@
 library(tidyverse)
 library(progress)
 source("DB_connection.R")
-reddit_urls <- function(subreddit, start_date, end_date, num_urls=20) {
+
+reddit_urls <- function(subreddit, start_date, end_date, num_urls=5) {
   #extracts the top 100 submissions by comments from a subreddit
   #subreddit: string, subreddit to get URLs from
   #start_date: PosixCt datetime to start searching from
@@ -20,14 +21,18 @@ reddit_urls <- function(subreddit, start_date, end_date, num_urls=20) {
     
     tryCatch({
       pb$tick()
-      url_list[[paste0(as.integer(day))]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=50&num_comments=>%s",
+      url_list[[paste0(as.integer(day))]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=%s",
                                                      as.integer(day), as.integer(day)+86399, subreddit, num_urls) %>%
           URLencode() %>%
           jsonlite::fromJSON() %>% 
           .$data %>%
           as.data.frame() %>%
-          select(full_link)
-      Sys.sleep(1)}, error = function(e) { skip_to_next <<- TRUE})
+        select(full_link)
+
+      Sys.sleep(1)}, error = function(e) {
+        print(e)
+        skip_to_next <<- TRUE
+        })
     
     if(skip_to_next) {next}
     
@@ -143,10 +148,10 @@ ETL <- function(db_name, subreddit_vec, start_date, end_date) {
       if (length(urls)!=0){
         content <- reddit_content2(URLencode(urls[[1]]$full_link))
         saveData(db_name, sub, content)
-        print("SAVED")
+        print(paste0(nrow(content)," ", nrow(urls[[1]]$full_link), " SAVED"))
       }
     }
   }
 }
 
-ETL("reddit", c("wallstreetbets"), lubridate::ymd_hms("2020-11-04 00:00:00"), lubridate::ymd_hms("2021-06-20 00:00:00"))
+ETL("reddit", c("wallstreetbets"), lubridate::ymd_hms("2020-11-01 00:00:00"), lubridate::ymd_hms("2021-11-30 00:00:00"))
