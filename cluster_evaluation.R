@@ -151,6 +151,6 @@ get_word_cloud_community <- function(raw_data,communities,community) {
   dtm_d <-generate_term_doc_matrix_community(raw_data,communities,community)
   set.seed(1234)
   wordcloud(words = dtm_d$word, freq = dtm_d$freq, min.freq = 1,           
-                         max.words=50, random.order=FALSE, rot.per=0.35,            
-                         colors=brewer.pal(8, "Dark2"),scale=c(5, .2))
+            max.words=50, random.order=FALSE, rot.per=0.35,
+            colors=brewer.pal(8, "Dark2"),scale=c(5, .2))
 }

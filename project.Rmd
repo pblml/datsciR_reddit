@@ -75,32 +75,28 @@ kbl(head(raw_data,3))
 ```
 Each comment contains the information of the content of the comment, user that make the comment, the related post with content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
 
-The problem that we identify on the data was that once a user from reddit is deleted, the comment will have in the column author or user the value "[deleted]". With this situation is not possible to identify correctly the users and create the right connection between them, which is really important for the community detection. To visualize this problem. The following graphics, shows the amount of comments per day and the amount of comments with author or user with value "[deleted]".
+The problem that we identify on the data was that once a user from reddit is deleted, the comment will have in the column author or user the value "[deleted]". With this situation is not possible to identify correctly the users and create the right connection between them, which is really important for the community detection. To visualize this problem. The following graphics, shows the percentage of comments per day that have deleted authors or users. The highest lost on comments are originated by deleted authors in both subreddits.
 
 ```{r proportionDeletedUsers, echo=FALSE,warning = FALSE}
-databaseName <- "reddit"
 collectionName <- "stocks"
-#get all the interactions with 
-deleted_comments <-getPostDeletedUser(databaseName,collectionName)
-colnames(deleted_comments) <- c('dates','deleted_users')
-deletedUsers_Authors <-getDeletedPost(databaseName,collectionName)
-colnames(deletedUsers_Authors) <- c('dates','deleted_auth_users')
-post_per_day <-getCommentsPerDay(databaseName,collectionName)
-colnames(post_per_day) <- c('dates','total_comments')
+source("reddit_related_functions.R")
 
-merged_data <- merge(x = post_per_day, y = deleted_comments, 
-                    by = "dates", all = TRUE) %>%
-  merge(.,deletedUsers_Authors, by="dates",all=TRUE) 
-              
-merged_data[is.na(merged_data)] <- 0
-merged_data$percentageLost <- merged_data$deleted_users / merged_data$total_comments
-merged_data$percentageAuthorUsers <- merged_data$deleted_auth_users / merged_data$total_comments
-merged_data$dates <- ymd(merged_data$dates)
+#get proportion of missing comments due to deleted users
+stock_comments <- get_info_deleted_users("stocks")
+wallstreetbets_comments <-get_info_deleted_users("wallstreetbets")
 
-ggplotly(ggplot(data=merged_data, aes(x=dates)) +
-           geom_line(aes(y=percentageLost), color="darkred")+
-           geom_line(aes(y=percentageAuthorUsers), color="steelblue")+ 
-           scale_x_date(date_labels = "%m-%Y"))
+
+ggplotly(ggplot(data=stock_comments, aes(x=dates)) +
+           geom_line(aes(y=percentage_comments_del_users), color="darkred")+
+           geom_line(aes(y=percentage_comments_del_authors), color="steelblue")+ 
+           scale_x_date(date_labels = "%m-%Y")+
+           labs(title="Proportion of missing comments due to deleted users subreddit Stocks"))
+
+ggplotly(ggplot(data=wallstreetbets_comments, aes(x=dates)) +
+           geom_line(aes(y=percentage_comments_del_users), color="darkred")+
+           geom_line(aes(y=percentage_comments_del_authors), color="steelblue")+ 
+           scale_x_date(date_labels = "%m-%Y")+
+           labs(title="Proportion of missing comments due to deleted users subreddit Wallstreetbets"))
 ```
 
 To work around this problem. We deleted all of the comments made by a user that was deleted and renamed the authors based on the post and additionally we stored the subreddit data in a cloud database service [MongoDB Atlas](https://www.mongodb.com/es/cloud/atlas). In this way we can reproduce our results from previous data even if the users change in Reddit.
@@ -238,7 +234,8 @@ ggplotly(ggplot(data=modularity_clusters, aes(x=id_test))+
            geom_bar(aes(y=value,fill=algorithm), 
                     stat = "identity", position = "dodge")+
            labs( x = "Test",
-                 y = "Modularity"))
+                 y = "Modularity",
+                 title = "Modularity per algorithm for each test"))
 
 ```
 
@@ -251,11 +248,15 @@ In terms of modularity, Louvain performed better than Infomap and Label Propagat
 cluster_numbers <- result %>%
   filter(measure == "clusters")
 
-ggplotly(ggplot(data=cluster_numbers, aes(x=id_test))+
-           geom_bar(aes(y=value,fill=algorithm), 
+ggplotly(ggplot(data=cluster_numbers, aes(x=id_test,y=value,fill=algorithm))+
+           geom_bar(aes(label=clusters_one_user),
                     stat = "identity", position = "dodge")+
+           geom_text(aes(label=clusters_one_user),
+                     position=position_dodge(width=0.9)
+                     ,vjust=-0.3)+
            labs( x = "Test",
-                 y = "Number Clusters"))
+                 y = "Number Clusters",
+                 title= "Number of clusters for each test with number of clusters with just one user"))
 
 ```
 
@@ -270,7 +271,8 @@ ggplotly(ggplot(data=time_algorithms, aes(x=id_test))+
            geom_bar(aes(y=value,fill=algorithm), 
                     stat = "identity", position = "dodge")+
            labs( x = "Test",
-                 y = "Execution time (s)"))
+                 y = "Execution time (s)",
+                 title = "Execution time per algorithm"))
 ```
 
 
@@ -296,7 +298,7 @@ visNetwork(nodes, edges)%>%
 ```
 
 
-Wordcloud for generated communities:
+To analyze the content of the comments for each cluster, as visualization we included some wordcloud from two different clusters and we can see that the main topics in both clusters are different. One one side we can see words like "amazon", "company", and "antitrust" as the most frequent word, as on the other it is "apple", "life", and "market".
 
 ```{r wordcloud, warning=FALSE}
 par(mfrow=c(1,2))

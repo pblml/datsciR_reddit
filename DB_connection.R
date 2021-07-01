@@ -51,7 +51,7 @@ saveData <- function(databaseName,collectionName,data) {
 }
 
 #get aggregated information of posts that have deleted user or author
-getDeletedPost <- function(databaseName,collectionName) {
+getNumberPostDeletedUsers <- function(databaseName,collectionName) {
   # Connect to the database
   db <- mongo(collection = collectionName,
               url = sprintf(
@@ -63,7 +63,8 @@ getDeletedPost <- function(databaseName,collectionName) {
               ),
               options = ssl_options(weak_cert_validation = TRUE))
   # Filter data
-  data <- db$aggregate('[{"$match":{"$or": [{"user": "[deleted]"},{"author": "[deleted]"}]}},
+  #data <- db$aggregate('[{"$match":{"$or": [{"user": "[deleted]"},{"author": "[deleted]"}]}},
+  data <- db$aggregate('[{"$match":{"user": "[deleted]"}},
                        {
                             "$group": {
                                 "_id": {
@@ -80,8 +81,8 @@ getDeletedPost <- function(databaseName,collectionName) {
   data
 }
 
-#get aggregated information of posts that have deleted user
-getPostDeletedUser <- function(databaseName,collectionName) {
+#get aggregated information of posts that have deleted user as authors
+getNumberPostDeletedAuthors <- function(databaseName,collectionName) {
   # Connect to the database
   db <- mongo(collection = collectionName,
               url = sprintf(
