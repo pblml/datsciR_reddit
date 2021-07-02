@@ -419,6 +419,13 @@ ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
                 label = percent(prop/100)), size=5)
 ```
 
+```{r}
+  collectionName <- "stocks"
+  initial_time <-"2021-01-23"
+  end_time <-"2021-01-24"
+visualization <- create_communities_visualization(collectionName,initial_time,end_time)
+visualization
+```
 
 
 *What visualizations did you use to look at your data in different ways?*

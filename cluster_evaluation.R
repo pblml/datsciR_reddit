@@ -4,6 +4,7 @@ library(ggraph)
 library(igraph)
 library(tm)
 library(wordcloud)
+library(visNetwork)
 source("DB_connection.R")
 
 #create an igraph representation of a subreddit in a timeframe
@@ -169,13 +170,86 @@ get_relevant_words_community <- function(raw_data,communities,community) {
   return(relevant_words)
 }
 
-#create interactive communities
-create_communities_visualization <- function(collectionName, collectionClusters, initial_date, final_date){
-  #create graph representation
-  g <-create_subreddit_graph(id_test,databaseName,collectionName,initial_time,end_time)
-  #create communities
-  communities <- cluster_louvain(g)
-  #get relevant words for each community
-  #get nodes and edges
-  #create VisNetwork representation
+
+get_related_tickers_community <-function(comments, communities,community){
+  tryCatch({
+    tickers_comments <- comments %>%
+      filter(user %in% as.list(communities[[community]])|author %in%
+               as.list(communities[[community]])) %>%
+      select(ticker) 
+    aux_tickers <-paste(lapply(tickers_comments$ticker, function(x) paste(x,collapse=',')),
+                        collapse=",")
+    tickers_community <-unique(unlist(strsplit(aux_tickers, ",")))
+  },
+  error=function(cond) {
+    return(c(""))
+  }
+  )
 }
+
+get_related_tickers_user <-function(comments, nameUser){
+  tryCatch({
+    tickers_comments <- comments %>%
+      filter(user == nameUser|author == nameUser) %>%
+      select(ticker) 
+    aux_tickers <-paste(lapply(tickers_comments$ticker, function(x) paste(x,collapse=',')),
+                        collapse=",")
+    unique_tickers <-unique(unlist(strsplit(aux_tickers, ",")))
+    unlist(paste(unique_tickers,collapse=","))
+  },
+  error=function(cond){
+    return("")
+  })
+}
+
+
+#create interactive communities
+create_communities_visualization <- function(collectionName, initial_date, final_date){
+  
+  databaseName <- "reddit"
+  #get related information DB
+  raw_data <- loadDataDates(databaseName,collectionName,initial_date,final_date) %>%
+    filter(user!="[deleted]") 
+  #create graph representation
+  g <-create_subreddit_graph(databaseName,collectionName,initial_date,final_date)
+  #create communities
+  cl <- cluster_louvain(g)
+  communities_cl <- communities(cl)
+  #get relevant tickers for each community
+  tickers_communities <- lapply(1:length(communities_cl),
+                                function(x)
+                                  get_related_tickers_community(raw_data,communities_cl,x))
+  tickers_communities <- lapply(tickers_communities,
+                                function(x)
+                                  unlist(paste(x,collapse=",")))
+  
+  #get nodes and edges
+  nodes <-do.call(rbind.data.frame, as.list(V(g)$name)) %>%
+    rename_at(1,~"id") %>%
+    mutate(id_group = membership(cl), label = id) %>%
+    mutate(description = unlist(tickers_communities[id_group])) %>%
+    unite('group',c(id_group,description), remove=FALSE, sep=": ") %>%
+    select(id,group,label)
+  
+  #get tickers per node
+  nodes$tickers = lapply(nodes$id,
+                         function(x)
+                           get_related_tickers_user(raw_data,x))
+  #add title to nodes
+  nodes <- nodes %>%
+    mutate(title = paste0("<p><b>Tickers ",id,":</b><br>",tickers,"</p>"))
+  
+  #get nodes
+  edges <- get.data.frame(g, what= c("edges") )
+
+  #create VisNetwork representation
+  visualization <- visNetwork(nodes, edges)%>%
+    visClusteringByGroup(groups = unique(nodes$group), label="Cluster ")%>% 
+    visNodes(title = "<p><b>Cluster</b></p>")%>%
+    visInteraction(navigationButtons = TRUE)#%>% 
+}
+
+# collectionName <- "stocks"
+# initial_time <-"2021-01-23"
+# end_time <-"2021-01-24"
+# visualization <- create_communities_visualization(collectionName,initial_time,end_time)
