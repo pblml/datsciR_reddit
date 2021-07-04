@@ -17,26 +17,24 @@ reddit_urls <- function(subreddit, start_date, end_date, num_urls=5) {
   for (day in seq_days) {
     skip_to_next <- FALSE
     
-    # Note that print(b) fails since b doesn't exist
-    
     tryCatch({
       pb$tick()
-      url_list[[paste0(as.integer(day))]] <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=%s",
-                                                     as.integer(day), as.integer(day)+86399, subreddit, num_urls) %>%
-          URLencode() %>%
-          jsonlite::fromJSON() %>% 
-          .$data %>%
-          as.data.frame() %>%
+      url_list <- sprintf("https://api.pushshift.io/reddit/search/submission/?q=&after=%s&before=%s&subreddit=%s&author=&aggs=&metadata=true&frequency=hour&advanced=false&sort=desc&domain=&sort_type=num_comments&size=%s",
+                          as.integer(day), as.integer(day)+86399, subreddit, num_urls) %>%
+        URLencode() %>%
+        jsonlite::fromJSON() %>% 
+        .$data %>%
+        as.data.frame() %>%
         select(full_link)
-
+      
       Sys.sleep(1)}, error = function(e) {
         print(e)
         skip_to_next <<- TRUE
-        })
+      })
     
     if(skip_to_next) {next}
     
-    }
+  }
   return(url_list)
 }
 
@@ -86,7 +84,7 @@ reddit_content2 <- function (URL, wait_time = 2) {
       URL[i] = paste0(gsub("/$", "", URL[i]), 
                       "/?ref=search_posts")
     X = paste0(gsub("\\?ref=search_posts$", "", 
-                    URL[i]), ".json?limit=500")
+                    URL[i]), ".json?limit=100")
     raw_data = tryCatch(RJSONIO::fromJSON(readLines(X, warn = FALSE)), 
                         error = function(e) NULL)
     if (is.null(raw_data)) {
@@ -103,11 +101,11 @@ reddit_content2 <- function (URL, wait_time = 2) {
         TEMP = data.frame(id = NA, structure = gsub("FALSE ", 
                                                     "", structure[!grepl("TRUE", structure)]), 
                           post_date = as.POSIXct(meta.node$created_utc, 
-                                                                origin = "1970-01-01", tz = "UTC"), 
+                                                 origin = "1970-01-01", tz = "UTC"), 
                           comm_date = as.POSIXct(unlist(lapply(main.node,
-                                                                              function(x) {
-                                                                                GetAttribute(x, "created_utc")
-                                                                              })), origin = "1970-01-01", tz = "UTC"), 
+                                                               function(x) {
+                                                                 GetAttribute(x, "created_utc")
+                                                               })), origin = "1970-01-01", tz = "UTC"), 
                           num_comments = meta.node$num_comments, subreddit = ifelse(is.null(meta.node$subreddit), 
                                                                                     "UNKNOWN", meta.node$subreddit), upvote_prop = meta.node$upvote_ratio, 
                           post_score = meta.node$score, author = meta.node$author, 
@@ -137,21 +135,35 @@ reddit_content2 <- function (URL, wait_time = 2) {
   return(data_extract)
 }
 
-ETL <- function(db_name, subreddit_vec, start_date, end_date) {
-  seq_days <- seq(start_date, end_date, by="1 day")
+ETL <- function(subreddit_vec, start_date, end_date, date_list=NULL) {
+  if (is.null(date_list)){
+    seq_days <- seq(start_date, end_date, by="1 day")  
+  } else {
+    seq_days <- date_list
+  }
+  res_lst <- list()
+  
+  tryCatch({
   for (sub in subreddit_vec){
+    tmp_df <- data.frame()
     for (d in seq_days) {
       print(as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
       urls <- reddit_urls(sub, 
                           as.POSIXct(d, origin = "1970-01-01", tz = "UTC"),
                           as.POSIXct(d, origin = "1970-01-01", tz = "UTC"))
-      if (length(urls)!=0){
-        content <- reddit_content2(URLencode(urls[[1]]$full_link))
-        saveData(db_name, sub, content)
-        print(paste0(nrow(content)," ", nrow(urls[[1]]$full_link), " SAVED"))
+      for (url in urls$full_link){
+        if (length(urls)!=0){
+          content <- reddit_content2(URLencode(url))
+          tmp_df <- rbind(tmp_df, content)
+          print(nrow(tmp_df))
+        }
       }
     }
-  }
+    res_lst[[paste0(sub)]] <- tmp_df
+  }}, error=function(cond) {print(paste0(cond, " ", d))
+    return(res_lst)})
+  return(res_lst)
 }
 
-ETL("reddit", c("wallstreetbets"), lubridate::ymd_hms("2020-11-01 00:00:00"), lubridate::ymd_hms("2021-11-30 00:00:00"))
+# mask <- (seq(min(stocks$date), max(stocks$date), by="1 days") %in% stocks$date)
+# seq(min(stocks$date), max(stocks$date), by="1 days")[!mask]
