@@ -16,7 +16,7 @@ library(visNetwork)
 library(BatchGetSymbols)
 library(scales)
 source("DB_connection.R")
-options(dplyr.summarise.inform = FALSE)
+set.seed(123)
 ```
 
 # Overview and Motivation
@@ -45,7 +45,7 @@ The questions evolved during the first stages of data collecting and research ab
 ### 1. How can we identify subcommunities inside subreddit and which measures can be used to evaluate the subcommunities?
 A subreddit is already a big community inside Reddit, which allows the interaction between users. It is important to represent the interaction from the users in order to find relations and smaller clusters from users which we can analyze afterwards.  
 
-### 2. Is it possible to identify stocks that are discussed in each subcommunity and the sentiment related to the stocks?
+### 2. How can we identify stocks that are discussed in each subcommunity and the sentiment related to the stocks?
 For this question we would like to find strategies that allows us to identify the stocks that are mentioned inside each community and the sentiment (positive, negative or neutral) towards the stocks.
 
 ### 3. Based on the stocks and sentiments towards them inside the communities, is it possible to find a correlation with the stock prices?
@@ -119,7 +119,6 @@ To get the market data for the relevant tickers, the package ['quantmod'](https:
 It takes a list of ticker symbols, a start and an end date and returns the market
 data in a clean format.
 
-**TODO: CODE EXAMPLE**
 ```{r stockDataExample }
 tickers <- c("GME","TSLA","AMC")
 l.out <- BatchGetSymbols(tickers = tickers, 
@@ -141,17 +140,37 @@ calls first check if the cached file contains all the relevant data.
 ### Sentiment analysis
 
 To examine the correlation between market data and sentiment, this measure has to be extracted from every comment.
-Multiple different approaches are available to get the sentiment of a post, which are compared in the following paragraphs
 
-* [sentimentr](https://cran.r-project.org/web/packages/sentimentr/sentimentr.pdf)
-* [SentimentAnalysis](https://cran.r-project.org/web/packages/SentimentAnalysis/SentimentAnalysis.pdf) (finance specific dict!)
+* For calculation of the sentiment the package  [sentimentr](https://cran.r-project.org/web/packages/sentimentr/sentimentr.pdf)
+* It uses a dictionary based approach and also takes modifiers and negators into account, which is a major advantage in comparison to the package [SentimentAnalysis](https://cran.r-project.org/web/packages/SentimentAnalysis/SentimentAnalysis.pdf) (finance specific dict!)
 
-#### Special Case: Wallstreetbets
+To consider the financial jargon used in these subreddits, the Loughran-McDonald dictionary is used for assigning polarity values to the words of a comment. The dictionary also has to be modified for the special slang of [r/wallstreetbets](www.reddit.com/r/wallstreetbets)
 
-Due to the distinguished slang of the wallstreetbets subreddit, the dictionary used for getting the sentiment has to be expanded.
-Common phrases like "to the moon" or "Congrats and f*** you" , which describes an extremely positive sentiment but are interpreted as neutral.
+```{r}
+wsb_specific_terms <- data.frame(x=c("to the moon", "cant go tits up", "tendies", "diamond hands", "paper hands"), y=c(1,1,1,1,-1)) %>% as_key()
 
-**TODO: CODE EXAMPLE**
+modified_dict <- lexicon::hash_sentiment_loughran_mcdonald %>% 
+  update_polarity_table(x=wsb_specific_terms)
+
+print(modified_dict %>% filter(y>0) %>% sample_n(10))
+print(modified_dict %>% filter(y<0) %>% sample_n(10))
+```
+
+```{r}
+wsb <- loadData("reddit", "wallstreetbets")
+stocks <- loadData("reddit", "stocks")
+```
+
+After adding the sentiment, we take a look at the the most positive and negative comments.
+
+```{r}
+print(stocks %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
+print(stocks %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment))
+
+print(wsb %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
+print(wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment))
+```
+
 
 ### Ticker extraction
 
@@ -183,8 +202,8 @@ initial_time <-"2021-01-23"
 end_time <-"2021-01-27"
 collectionName <- "stocks"
 
-raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
-  filter(user!="[deleted]")
+raw_data <- stocks %>%
+  filter(user!="[deleted]" & between(comm_date, lubridate::ymd(initial_time),  lubridate::ymd(end_time)))
 
 #for authors that have name [deleted] a new name is assigned with the structure "author_number"
 new_authors_names <-raw_data %>%

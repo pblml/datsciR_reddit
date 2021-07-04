@@ -1,5 +1,6 @@
 library(mongolite)
-source("config.R")
+#source("config.R")
+source("configStocks.R")
 
 loadData <- function(databaseName,collectionName) {
   # Connect to the database
@@ -127,7 +128,7 @@ getPostPerDay <- function(databaseName,collectionName){
                   "$group": {
                       "_id": {
                           "data":{"$substr": [
-                              "$comm_date", 0, 10
+                              "$post_date", 0, 10
                           ]},
                           "link":"$link"
                       }, 
