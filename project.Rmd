@@ -57,7 +57,7 @@ Considering the Gamestop event we would like to find out if there are relations 
 For this project we have two main sources of data, namely Reddit and Yahoo Finance. 
 
 ## Reddit comments
-The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the posts with more than 20 comments. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks". 
+The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the top 5 threads and first 100 comments per thread. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks". 
 
 **TODO: Pushshift is used to fetch the relevant urls, a modified version of RedditExtractoR::get_reddit is used to fetch the data**  
 
@@ -180,7 +180,7 @@ The weight of the edges is given by the number of interactions between the two u
 ```{r graphcreation, echo=FALSE ,warning = FALSE}
 
 initial_time <-"2021-01-23"
-end_time <-"2021-02-01"
+end_time <-"2021-01-27"
 collectionName <- "stocks"
 
 raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
@@ -318,7 +318,8 @@ edges <- get.data.frame(g, what= c("edges") )
 
 visNetwork(nodes, edges)%>%
   visClusteringByGroup(groups = unique(nodes$group), label="cluster: ")%>%
-  visInteraction(navigationButtons = TRUE)
+  visInteraction(navigationButtons = TRUE) %>%
+  visPhysics(maxVelocity = 1,repulsion = list(centralGravity=-0.5,springLength=500)) 
 ```
 
 
@@ -333,6 +334,45 @@ get_word_cloud_community(raw_data,communities(lc),5)
 get_word_cloud_community(raw_data,communities(lc),8)
 get_word_cloud_community(raw_data,communities(lc),10)
 ```
+
+```{r robinEvaluation}
+library(robin)
+
+#Finds if the community structure found is statistically significant by compare to a random curve
+graphRandom <- random(graph=g)
+Proc <- robinRobust(graph=g, graphRandom=graphRandom, method="louvain",
+                    measure="vi",type="independent")
+plotRobin(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom,
+          measure="vi", legend=c("Random", "Louvain"))
+robinAUC(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom)
+#get Bayes Factor
+BFLouvain <- robinGPTest(model1=Proc$Mean,model2=Proc$MeanRandom)
+#return the fitted curves and the adjusted p-values
+robinFDATest(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom,
+             measure="vi",legend=c("Louvain", "Null Model"))
+
+#compare two algorithms in the same initial graph
+#takes a lot of time Comparison Louvain and Infomap
+compare <- robinCompare(graph=g, method1="louvain",
+             method2="infomap", measure="vi", type="independent")
+
+plotRobin(graph=g, model1=compare$Mean1, model2=compare$Mean2,
+          measure="vi", legend=c("Louvain", "Infomap"))
+robinAUC(graph=g, model1=compare$Mean1, model2=compare$Mean2)
+
+#compare louvain with label propagation 
+compareLouvainLP <- robinCompare(graph=g, method1="louvain",
+             method2="labelProp", measure="vi", type="independent")
+plotRobin(graph=g, model1=compareLouvainLP$Mean1, model2=compareLouvainLP$Mean2,
+          measure="vi", legend=c("Louvain", "LabelPropagation"))
+robinAUC(graph=g, model1=compareLouvainLP$Mean1, model2=compareLouvainLP$Mean2)
+
+plotRobin(graph=g, model1=compare$Mean2, model2=compareLouvainLP$Mean2,
+          measure="vi", legend=c("Infomap", "LabelPropagation"))
+
+```
+
+
 
 # Exploratory Data Analysis
 
@@ -419,13 +459,7 @@ ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
                 label = percent(prop/100)), size=5)
 ```
 
-```{r}
-  collectionName <- "stocks"
-  initial_time <-"2021-01-23"
-  end_time <-"2021-01-24"
-visualization <- create_communities_visualization(collectionName,initial_time,end_time)
-visualization
-```
+
 
 
 *What visualizations did you use to look at your data in different ways?*

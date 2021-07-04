@@ -177,15 +177,25 @@ get_related_tickers_community <-function(comments, communities,community){
       filter(user %in% as.list(communities[[community]])|author %in%
                as.list(communities[[community]])) %>%
       select(ticker) 
+    #turn list of tickers into string of tickers separated by ,
     aux_tickers <-paste(lapply(tickers_comments$ticker, function(x) paste(x,collapse=',')),
                         collapse=",")
-    tickers_community <-unique(unlist(strsplit(aux_tickers, ",")))
+    # get frequency of tickers and select top 3 and frequency
+    tickers_community <- as.data.frame(table(strsplit(aux_tickers, ","),exclude = "")) %>%
+      arrange(desc(Freq)) %>%
+      slice_head( n=3)%>%
+      mutate(ticker_info = paste(Var1,"(",Freq,")",sep=""))
+      
+    tickers_community <-paste(tickers_community$ticker_info,collapse=",")
   },
   error=function(cond) {
     return(c(""))
   }
   )
 }
+
+
+tickers <- get_related_tickers_community(raw_data,communities_cl,5)
 
 get_related_tickers_user <-function(comments, nameUser){
   tryCatch({
@@ -219,9 +229,6 @@ create_communities_visualization <- function(collectionName, initial_date, final
   tickers_communities <- lapply(1:length(communities_cl),
                                 function(x)
                                   get_related_tickers_community(raw_data,communities_cl,x))
-  tickers_communities <- lapply(tickers_communities,
-                                function(x)
-                                  unlist(paste(x,collapse=",")))
   
   #get nodes and edges
   nodes <-do.call(rbind.data.frame, as.list(V(g)$name)) %>%
@@ -245,11 +252,13 @@ create_communities_visualization <- function(collectionName, initial_date, final
   #create VisNetwork representation
   visualization <- visNetwork(nodes, edges)%>%
     visClusteringByGroup(groups = unique(nodes$group), label="Cluster ")%>% 
-    visNodes(title = "<p><b>Cluster</b></p>")%>%
-    visInteraction(navigationButtons = TRUE)#%>% 
-}
+    #visNodes(title = "<p><b>Cluster</b></p>")%>%
+    visInteraction(navigationButtons = TRUE) %>%
+    visPhysics(maxVelocity = 1,repulsion = list(centralGravity=-0.5,springLength=500)) 
+} 
 
 # collectionName <- "stocks"
-# initial_time <-"2021-01-23"
-# end_time <-"2021-01-24"
-# visualization <- create_communities_visualization(collectionName,initial_time,end_time)
+# initial_date <-"2021-01-20"
+# final_date <-"2021-02-04"
+# vis <-create_communities_visualization(collectionName,initial_time,end_time)
+# vis
