@@ -78,4 +78,3 @@ create_communities_subreddits <- function(collectionName, collectionClusters){
 
 #create_communities_subreddits("stocks","clusters_stocks")
 #create_communities_subreddits("wallstreetbets","clusters_wallstreetbets")
-

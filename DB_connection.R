@@ -30,8 +30,8 @@ loadDataDates <- function(databaseName,collectionName,initial_date, final_date) 
               ),
               options = ssl_options(weak_cert_validation = TRUE))
   # Read all the entries
-  data <- db$find(sprintf('{"post_date" : { "$gte" : { "$date" : "%s" }},
-                    "post_date" : { "$lte" : { "$date" : "%s" }}}',format(as.Date(initial_date), "%Y-%m-%dT%H:%M:%SZ"),
+  data <- db$find(sprintf('{"comm_date" : { "$gte" : { "$date" : "%s" }},
+                    "comm_date" : { "$lte" : { "$date" : "%s" }}}',format(as.Date(initial_date), "%Y-%m-%dT%H:%M:%SZ"),
                           format(as.Date(final_date), "%Y-%m-%dT%H:%M:%SZ")))
   data
 }
@@ -65,7 +65,7 @@ getNumberPostDeletedUsers <- function(databaseName,collectionName) {
               options = ssl_options(weak_cert_validation = TRUE))
   # Filter data
   #data <- db$aggregate('[{"$match":{"$or": [{"user": "[deleted]"},{"author": "[deleted]"}]}},
-  data <- db$aggregate('[{"$match":{"user": "[deleted]"}},
+  data <- db$aggregate('[{"$match":{"user": "[deleted]", "comm_date": { "$lte" : { "$date" : "2021-05-01T00:00:00Z" }}}},
                        {
                             "$group": {
                                 "_id": {
@@ -82,6 +82,8 @@ getNumberPostDeletedUsers <- function(databaseName,collectionName) {
   data
 }
 
+
+
 #get aggregated information of posts that have deleted user as authors
 getNumberPostDeletedAuthors <- function(databaseName,collectionName) {
   # Connect to the database
@@ -95,7 +97,7 @@ getNumberPostDeletedAuthors <- function(databaseName,collectionName) {
               ),
               options = ssl_options(weak_cert_validation = TRUE))
   # Filter data
-  data <- db$aggregate('[{"$match":{"author": "[deleted]"}},
+  data <- db$aggregate('[{"$match":{"author": "[deleted]", "comm_date": { "$lte" : { "$date" : "2021-05-01T00:00:00Z" }}}},
                        {
                             "$group": {
                                 "_id": {
@@ -154,7 +156,7 @@ getCommentsPerDay <- function(databaseName,collectionName){
                 databaseName
               ),
               options = ssl_options(weak_cert_validation = TRUE))
-  data <- db$aggregate('[
+  data <- db$aggregate('[{"$match":{"comm_date": { "$lte" : { "$date" : "2021-05-01T00:00:00Z" }}}},
           {
               "$group": {
                   "_id": {

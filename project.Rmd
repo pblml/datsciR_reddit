@@ -58,7 +58,7 @@ Considering the Gamestop event we would like to find out if there are relations 
 For this project we have two main sources of data, namely Reddit and Yahoo Finance. 
 
 ## Reddit comments
-The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments on the top 5 threads and first 100 comments per thread. We got the data from 11.01.2020 for the subreddits "Wallstreetbets" and "stocks". 
+The data that we use from the subreddits are comments on posts and the post content. For this purpose we used the library RedditExtractoR and extract daily the comments by selecting the top 5 threads posted on the specific date and the first 100 comments per thread. We got the data from 11.01.2020 to 01.05.2021 for the subreddits "Wallstreetbets" and "stocks". 
 
 **TODO: Pushshift is used to fetch the relevant urls, a modified version of RedditExtractoR::get_reddit is used to fetch the data**  
 
@@ -69,16 +69,19 @@ The structure of the retrieved comments is presented in the following table:
 
 databaseName <- "reddit"
 collectionName <- "stocks"
-initial_time <-"2020-12-23"
-end_time <-"2020-12-27"
+initial_time <-"2021-02-10"
+end_time <-"2021-02-12"
 
-raw_data <- loadDataDates(databaseName,collectionName,initial_time,end_time)
+sample <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
+  subset(select = -c(ticker,sentiment))
 
-kbl(head(raw_data,3)) 
+kbl(head(sample,3)) %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
 ```
-Each comment contains the information of the content of the comment, user that make the comment, the related post with content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
+Each comment contains the information of the content of the comment, user that make the comment, the related post including the content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
 
-The problem that we identify on the data was that once a user from reddit is deleted, the comment will have in the column author or user the value "[deleted]". With this situation is not possible to identify correctly the users and create the right connection between them, which is really important for the community detection. To visualize this problem. The following graphics, shows the percentage of comments per day that have deleted authors or users. The highest lost on comments are originated by deleted authors in both subreddits.
+One problem that we identify on the data was that once a user from reddit is deleted, the comment will have in the column author or user the value "[deleted]". With this situation is not possible to correctly identify the users and create the right connection between them, which is really important for the community detection. The following graphics present a visualization of the proportion of comments per day that have deleted author or user. 
 
 ```{r proportionDeletedUsers, echo=FALSE,warning = FALSE}
 collectionName <- "stocks"
@@ -96,8 +99,8 @@ ggplotly(ggplot(data=stock_comments, aes(x=dates)) +
              'Users' = 'darkred',
              'Authors' = 'steelblue'))+
            scale_x_date(date_labels = "%m-%Y")+
-           labs(title="Proportion of missing comments due to deleted users subreddit Stocks",
-                x = "Date",
+           labs(title="Proportion of comments with deleted author/user subreddit Stocks",
+                x = "Comment Date",
                 y = "Proportion of comments with deleted user/author"))
 
 ggplotly(ggplot(data=wallstreetbets_comments, aes(x=dates)) +
@@ -107,12 +110,16 @@ ggplotly(ggplot(data=wallstreetbets_comments, aes(x=dates)) +
              'Users' = 'darkred',
              'Authors' = 'steelblue'))+ 
            scale_x_date(date_labels = "%m-%Y")+
-           labs(title="Proportion of missing comments due to deleted users subreddit Wallstreetbets",
-                x = "Date",
+           labs(title="Proportion of comments with deleted author/user subreddit Wallstreetbets",
+                x = "Comment Date",
                 y = "Proportion of comments with deleted user/author"))
 ```
 
-To work around this problem. We deleted all of the comments made by a user that was deleted and renamed the authors based on the post and additionally we stored the subreddit data in a cloud database service [MongoDB Atlas](https://www.mongodb.com/es/cloud/atlas). In this way we can reproduce our results from previous data even if the users change in Reddit.
+If we don't consider comments with deleted user or author we are loosing too many comments, which is also not ideal. With the graphic we can observe that the biggest problem is when authors are missing, for those cases we can lose more than 50% of the comments for a given date. To work around this problem. We decided to delete all of the comments made by a user that was deleted and renamed the authors based on the post. 
+
+Moreover, We stored the subreddit data in a cloud database service [MongoDB Atlas](https://www.mongodb.com/es/cloud/atlas). In this way we can reproduce our results from previous data even if the users change overtime in Reddit.
+
+The data is stored in a single database name "reddit", which has two separate collections named "stocks" and "wallstreet" with the raw data. The manipulation of the data was made by using the library [mongolite](https://cran.r-project.org/web/packages/mongolite/mongolite.pdf).
 
 ## Stock data
 
