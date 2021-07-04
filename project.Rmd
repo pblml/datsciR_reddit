@@ -353,12 +353,12 @@ robinFDATest(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom,
 
 #compare two algorithms in the same initial graph
 #takes a lot of time Comparison Louvain and Infomap
-compare <- robinCompare(graph=g, method1="louvain",
-             method2="infomap", measure="vi", type="independent")
-
-plotRobin(graph=g, model1=compare$Mean1, model2=compare$Mean2,
-          measure="vi", legend=c("Louvain", "Infomap"))
-robinAUC(graph=g, model1=compare$Mean1, model2=compare$Mean2)
+# compare <- robinCompare(graph=g, method1="louvain",
+#              method2="infomap", measure="vi", type="independent")
+# 
+# plotRobin(graph=g, model1=compare$Mean1, model2=compare$Mean2,
+#           measure="vi", legend=c("Louvain", "Infomap"))
+# robinAUC(graph=g, model1=compare$Mean1, model2=compare$Mean2)
 
 #compare louvain with label propagation 
 compareLouvainLP <- robinCompare(graph=g, method1="louvain",
@@ -367,8 +367,8 @@ plotRobin(graph=g, model1=compareLouvainLP$Mean1, model2=compareLouvainLP$Mean2,
           measure="vi", legend=c("Louvain", "LabelPropagation"))
 robinAUC(graph=g, model1=compareLouvainLP$Mean1, model2=compareLouvainLP$Mean2)
 
-plotRobin(graph=g, model1=compare$Mean2, model2=compareLouvainLP$Mean2,
-          measure="vi", legend=c("Infomap", "LabelPropagation"))
+# plotRobin(graph=g, model1=compare$Mean2, model2=compareLouvainLP$Mean2,
+#           measure="vi", legend=c("Infomap", "LabelPropagation"))
 
 ```
 
