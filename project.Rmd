@@ -15,6 +15,7 @@ library(igraph)
 library(visNetwork)
 library(BatchGetSymbols)
 library(scales)
+library(sentimentr)
 source("DB_connection.R")
 set.seed(123)
 ```
@@ -203,7 +204,8 @@ end_time <-"2021-01-27"
 collectionName <- "stocks"
 
 raw_data <- stocks %>%
-  filter(user!="[deleted]" & between(comm_date, lubridate::ymd(initial_time),  lubridate::ymd(end_time)))
+  filter(user!="[deleted]",comm_date>=lubridate::ymd(initial_time),
+         comm_date<=lubridate::ymd(end_time))
 
 #for authors that have name [deleted] a new name is assigned with the structure "author_number"
 new_authors_names <-raw_data %>%
@@ -245,8 +247,7 @@ connections <-rbind(comments_posts, nested_comments) %>%
 #create igraph object
 g <- graph_from_data_frame(connections,directed=FALSE)
 
-g %>%
-  plot(vertex.label=NA, vertex.color="blue", vertex.size=5)
+plot(g,vertex.label=NA, vertex.color="blue", vertex.size=5)
 ```
 
 
