@@ -260,7 +260,7 @@ nyse_lst_mod %>%
 To add this information, a helper function was written which adds columns for sentiment and the mentioned tickers respectively.
 
 ```{r tickerExtractionExample}
-source("ticker_test.R")
+source("ticker_extraction.R")
 example_df <- data.frame(comment = c("I bought AMC and BB", "I sold Palantir. PLTR was not the best stock to invest into but GME was"), user = c("A", "B"))
 
 add_tickers_sentiment(example_df,
@@ -509,7 +509,7 @@ ggplot(tickers_week_wsb, aes(x=CW, y=count)) +
 
 ggplot(tickers_week_stocks, aes(x=CW, y=count)) +
   geom_col(position = "dodge") +
-  theme(axis.text.x=element_text(angle = -45, hjust = 0)) +
+  theme(axis.text.x=element_text(angle = -45, hjust = 0)) +<- readRDS("../stocks.Rds")
   facet_grid(ticker~.)
 ```
 
