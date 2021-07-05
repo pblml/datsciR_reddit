@@ -33,7 +33,11 @@ loadDataCol <- function(databaseName,collectionName) {
   data <- db$find(fields='{"comm_date":1,
                             "subreddit":1,
                   "sentiment":1,
-                  "ticker":1}')
+                  "ticker":1,
+                  "author":1,
+                  "user":1,
+                  "link":1, 
+                  "structure":1}')
   data
 }
 

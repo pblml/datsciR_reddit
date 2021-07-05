@@ -27,10 +27,11 @@ shinyUI(
                     tags$h4("3. Based on the stocks and sentiments towards them inside the communities, is it possible to find a correlation with the stock prices?"),
                     tags$p("Considering the Gamestop event we would like to find out if there are relations between the sentiment that the users express in the subreddit towards a stock with the real stock prices.")
                     ),
-            tabPanel(title = "Reddit Data",
+            tabPanel(title = "Data",
                      ""),
             tabPanel(title = "Community Detection",""),
-            tabPanel(title = "Interactive Community creation",
+            tabPanel(title = "Stock Analysis",""),
+            tabPanel(title = "Interactive Community Analysis",
                      sidebarLayout(
                          sidebarPanel(
                              dateRangeInput("daterange1", "Date range:",
@@ -52,9 +53,15 @@ shinyUI(
                              
                          )
                      )),
-            tabPanel(title = "Stock Analysis",""),
             tabPanel(title = "Resources",
-                     "")
+                     mainPanel(
+                         tags$a( href = "", target="_blank",
+                                 tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
+                         ),
+                         tags$a( href = "https://github.com/pblml/datsciR_reddit", target="_blank",
+                                 tags$img( id = "github-logo", src="logo_github.jpg",height = 200, width = 200)
+                         ),
+                     ))
         ),
 
     )

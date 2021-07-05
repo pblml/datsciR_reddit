@@ -272,7 +272,7 @@ get_related_tickers_user <- function(comments, nameUser) {
 }
 
 
-#create interactive communities
+#create interactive communities from the DB
 create_communities_visualization <-
   function(collectionName, initial_date, final_date) {
     databaseName <- "reddit"
@@ -283,6 +283,98 @@ create_communities_visualization <-
     #create graph representation
     g <-
       create_subreddit_graph(databaseName, collectionName, initial_date, final_date)
+    #create communities
+    cl <- cluster_louvain(g)
+    communities_cl <- communities(cl)
+    #get relevant tickers for each community
+    tickers_communities <- lapply(1:length(communities_cl),
+                                  function(x)
+                                    get_related_tickers_community(raw_data, communities_cl, x))
+    
+    #get nodes and edges
+    nodes <- do.call(rbind.data.frame, as.list(V(g)$name)) %>%
+      rename_at(1,  ~ "id") %>%
+      mutate(id_group = membership(cl), label = id) %>%
+      mutate(description = unlist(tickers_communities[id_group])) %>%
+      unite('group',
+            c(id_group, description),
+            remove = FALSE,
+            sep = ": ") %>%
+      select(id, group, label)
+    
+    #get tickers per node
+    nodes$tickers = lapply(nodes$id,
+                           function(x)
+                             get_related_tickers_user(raw_data, x))
+    #add title to nodes
+    nodes <- nodes %>%
+      mutate(title = paste0("<p><b>Tickers ", id, ":</b><br>", tickers, "</p>"))
+    
+    #get nodes
+    edges <- get.data.frame(g, what = c("edges"))
+    
+    #create VisNetwork representation
+    visualization <- visNetwork(nodes, edges) %>%
+      visClusteringByGroup(groups = unique(nodes$group), label = "Cluster ") %>%
+      #visNodes(title = "<p><b>Cluster</b></p>")%>%
+      visInteraction(navigationButtons = TRUE) %>%
+      visPhysics(
+        maxVelocity = 1,
+        repulsion = list(centralGravity = -0.5, springLength = 500)
+      )
+  }
+
+######----------------------------------------------------------------------------------
+
+#Methods that create visualization for communities from a given dataframe
+
+#create igraph from dataframe
+create_subreddit_graph_from_df <-
+  function(raw_data) {
+    
+    #for authors that have name [deleted] a new name is assigned with the structure "author_number"
+    new_authors_names <- raw_data %>%
+      filter(author == "[deleted]") %>%
+      distinct(link) %>%
+      mutate(author_name = paste0("author_", row_number(.)))
+    
+    raw_data <- raw_data %>%
+      left_join(., new_authors_names, by = c("link" = "link")) %>%
+      mutate(author = ifelse(author == "[deleted]", author_name, author))
+    
+    #create dataframe with information about direct comments to posts and nested comments
+    comments_posts <- raw_data %>%
+      filter(!grepl("_", structure)) %>%
+      rename(from = user,
+             to = author) %>%
+      subset(select = c(from, to))
+    
+    nested_comments <- raw_data %>%
+      mutate(from = structure,
+             to = gsub("^(.*)_\\d+$", "\\1", structure)) %>%
+      subset(select = c(user, from, to, link)) %>%
+      left_join(., ., by = c("link" = "link", "from" = "to")) %>%
+      drop_na("user.y") %>%
+      select("from" = user.y, "to" = user.x)
+    
+    connections <- rbind(comments_posts, nested_comments) %>%
+      filter(from != to) %>%
+      group_by(from, to) %>%
+      summarise(weight = n()) %>%
+      ungroup() %>%
+      mutate(width = weight + 5)
+    
+    #create igraph object
+    #First two columns work as edge list and the others as
+    g <- graph_from_data_frame(connections, directed = FALSE)
+    g
+  }
+
+#create visualization with VisNetwork from an input dataframe
+create_communities_visualization_from_df <-
+  function(raw_data) {
+    #create graph representation
+    g <- create_subreddit_graph_from_df(raw_data)
     #create communities
     cl <- cluster_louvain(g)
     communities_cl <- communities(cl)

@@ -431,22 +431,12 @@ When we compare with robin the best two algorithms from our modularity test (Lou
 
 Considering these tests, we selected Louvain as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm.
 
-```{r cluster_example}
+```{r cluster_example, echo = FALSE}
 #create communities
 lc <- cluster_louvain(g)
 
-# Get nodes and edges for the creation of the visualization of the community
-nodes <-do.call(rbind.data.frame, as.list(V(g)$name)) %>%
-  mutate(group = membership(lc)) %>%
-  rename("id" = 1) %>%
-  mutate(labels = id)
-#get edges from data
-edges <- get.data.frame(g, what= c("edges") )
-
-visNetwork(nodes, edges)%>%
-  visClusteringByGroup(groups = unique(nodes$group), label="cluster: ")%>%
-  visInteraction(navigationButtons = TRUE) %>%
-  visPhysics(maxVelocity = 1,repulsion = list(centralGravity=-0.5,springLength=500)) 
+visualization <- create_communities_visualization_from_df(raw_data)
+visualization
 ```
 
 To analyze the content of the comments for each cluster, we inspect some random clusters to find the most common words, which are displayed in the following wordclouds. For some clusters we can find that they use quite often the same words like "stocks" and "buy", but we also observed that we have different topics on each cluster.
@@ -606,7 +596,7 @@ summary_users <- active_users %>%
   summarise(prop=(n()/nrow(active_users))*100)
 
 ggplotly(ggplot(data=summary_users, aes(x=type_participation))+
-           geom_bar(aes(y=prop), 
+           geom_bar(aes(y=prop),
                     stat = "identity", position = "dodge")+
            labs(title="User participation in Subreddits",
                 x = "Subreddit",

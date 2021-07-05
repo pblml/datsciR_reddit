@@ -25,7 +25,11 @@ shinyServer(function(input, output) {
     initial_date <- input$daterange1[1]
     end_date <- input$daterange1[2]
     subreddit <- input$subreddit
-    create_communities_visualization(subreddit,initial_date,end_date)
+    #create_communities_visualization(subreddit,initial_date,end_date)
+    vis_data <- dat %>%
+      mutate(date=lubridate::date(comm_date)) %>%
+      filter(subreddit == input$subreddit, date>=input$daterange1[1], date<=input$daterange1[2])
+    create_communities_visualization_from_df(vis_data)
   })
  
   observeEvent(input$symbol, {
