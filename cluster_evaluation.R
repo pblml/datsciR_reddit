@@ -66,6 +66,8 @@ clustering_evaluation <-
     g <-
       create_subreddit_graph(databaseName, collectionName, initial_time, end_time)
     
+    datasetSize <- nrow(loadDataDates(databaseName, collectionName, initial_time, end_time) %>%
+      filter(user != "[deleted]"))
     #execute clustering algorithms
     #louvain
     start_time <- Sys.time()
@@ -125,7 +127,7 @@ clustering_evaluation <-
     result <-
       list(
         df = rbind(modularities, clusters, time),
-        number_comments = nrow(raw_data)
+        number_comments = datasetSize
       )
   }
 
@@ -134,14 +136,13 @@ clustering_evaluation <-
 evaluations <- data.frame(
   test = 1:4,
   collectionName = c("wallstreetbets", "stocks", "wallstreetbets", "stocks"),
-  initial_time = c("2021-02-03", "2020-11-03", "2021-01-03", "2020-11-03"),
-  end_time = c("2021-02-05", "2020-11-07", "2021-01-07", "2020-11-12"),
+  initial_time = c("2021-02-03", "2020-11-03", "2021-01-03", "2021-01-03"),
+  end_time = c("2021-02-05", "2020-11-07", "2021-01-07", "2021-01-13"),
   number_comments = rep(NA, 4)
 )
 
 result <- data.frame()
 for (i in 1:nrow(evaluations)) {
-  print(i)
   row <- evaluations[i, ]
   result_evaluation <-
     clustering_evaluation(row$test,

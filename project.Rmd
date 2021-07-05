@@ -205,13 +205,13 @@ Disadvantages of this method in comparison to a fixed dictionary are:
 
 ### Community detection
 
-For the community detection we used the library igraph. The subreddit's information was transformed into a graph representation. Nodes represent the users of the subreddit, while interaction between the users is represented by edges. The interactions are classified into:
+For the community detection we used the library igraph. For this purpose the subreddit's data was transformed into a graph representation. Nodes represent the users of the subreddit, while interaction between the users is represented by edges. The interactions are classified into:
 
 **1. Answers to a post:** direct comments to a post. For this case an edge is created between the user and the author of the post.
 
 **2. Answer to a comment:** comments made as answer to other comments. For this case an edge is created between two users and it requires to use the hierarchy of comments to find the proper connection.
 
-The weight of the edges is given by the number of interactions between the two users. A visual representation of the graph created by the comments between the dates 2020-11-03 and 2020-11-06 for the subreddit stocks is as follows: 
+The weight of the edges is given by the number of interactions between the two users. A visual representation of the graph created by the comments between the dates 2021-01-23 and 2021-01-26 for the subreddit is presented in the following plot.  
 
 ```{r graphcreation, echo=FALSE ,warning = FALSE}
 
@@ -269,9 +269,15 @@ plot(g,vertex.label=NA, vertex.color="blue", vertex.size=5)
 
 **Clustering Algorithms: **
 
-For the community detection we considered the algorithms [Louvain](https://en.wikipedia.org/wiki/Louvain_method), [Infomap](https://www.mapequation.org/infomap/) and [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm). Since there is no external information about the communities detected, modularity is used to evaluate the quality of the clustering. Modularity measures how strong is the community structure generated and it can be defined as "a normalized tradeoff between edges covered by clusters and squared cluster degree sums"[@modularity]
-s
-In order to compare the cluster algorithms, we run all of them 4 different samples of the data as shown in the following table. We used both subreddits wallstreetbets and stocks and have different sizes on samples. With this test we recorded the modularity, execution time and number of clusters created. The results from the evaluation are given in the following plots. 
+For the community detection we considered three of the available algorithms in the igraph library, they are: 
+
+* [Louvain](https://en.wikipedia.org/wiki/Louvain_method): Algorithm based on modularity. It builds a hierarchy of communities while maximizing the modularity value. 
+* [Infomap](https://www.mapequation.org/infomap/): Algorithm based on the Map equation. 
+* [label propagation](https://en.wikipedia.org/wiki/Label_propagation_algorithm): The algorithm starts by given a unique labels to each node, and it propagates iteratively the labels through the network by updating the neighbors until no node need to update the label. 
+
+Since there is no external information about the communities detected, modularity is used as main measure to evaluate the quality of the clustering. Modularity measures how strong is the community structure generated and it can be defined as "a normalized tradeoff between edges covered by clusters and squared cluster degree sums"[@modularity].
+
+In order to compare the cluster algorithms, we evaluate all of algorithms over 4 different samples of the data as shown in the following table. We used both subreddits wallstreetbets and stocks with different sample sizes. With this test we recorded the modularity and execution time. The results from the evaluation are given in the following plots. 
 
 ```{r include=FALSE}
 source("cluster_evaluation.R")
@@ -302,26 +308,6 @@ ggplotly(ggplot(data=modularity_clusters, aes(x=id_test))+
 
 In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. 
 
-
-```{r number_clusters, echo=FALSE, warning=FALSE}
-
-cluster_numbers <- result %>%
-  filter(measure == "clusters")
-
-ggplotly(ggplot(data=cluster_numbers, aes(x=id_test,y=value,fill=algorithm))+
-           geom_bar(aes(label=clusters_one_user),
-                    stat = "identity", position = "dodge")+
-           geom_text(aes(label=clusters_one_user),
-                     position=position_dodge(width=0.9)
-                     ,vjust=-0.3)+
-           labs( x = "Test",
-                 y = "Number Clusters",
-                 title= "Number of clusters for each test with number of clusters with just one user"))
-
-```
-
-
-Louvain create small number of cluster in almost all of the cases. This clusters contain in general big amount of users and there are no clusters with just one user for Louvain. In contrast, Infomap generated for all of the tests clusters with just one user. In the case of Label propagation just for the first test it generated one cluster with just one user and for the third test, the number of clusters generated was smaller than for Louvain.
 
 ```{r echo=FALSE, warning=FALSE}
 time_algorithms <- result %>%
@@ -371,42 +357,7 @@ get_word_cloud_community(raw_data,communities(lc),8)
 get_word_cloud_community(raw_data,communities(lc),10)
 ```
 
-```{r robinEvaluation}
-library(robin)
 
-#Finds if the community structure found is statistically significant by compare to a random curve
-graphRandom <- random(graph=g)
-Proc <- robinRobust(graph=g, graphRandom=graphRandom, method="louvain",
-                    measure="vi",type="independent")
-plotRobin(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom,
-          measure="vi", legend=c("Random", "Louvain"))
-robinAUC(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom)
-#get Bayes Factor
-BFLouvain <- robinGPTest(model1=Proc$Mean,model2=Proc$MeanRandom)
-#return the fitted curves and the adjusted p-values
-robinFDATest(graph=g, model1=Proc$Mean, model2=Proc$MeanRandom,
-             measure="vi",legend=c("Louvain", "Null Model"))
-
-#compare two algorithms in the same initial graph
-#takes a lot of time Comparison Louvain and Infomap
-# compare <- robinCompare(graph=g, method1="louvain",
-#              method2="infomap", measure="vi", type="independent")
-# 
-# plotRobin(graph=g, model1=compare$Mean1, model2=compare$Mean2,
-#           measure="vi", legend=c("Louvain", "Infomap"))
-# robinAUC(graph=g, model1=compare$Mean1, model2=compare$Mean2)
-
-#compare louvain with label propagation 
-compareLouvainLP <- robinCompare(graph=g, method1="louvain",
-             method2="labelProp", measure="vi", type="independent")
-plotRobin(graph=g, model1=compareLouvainLP$Mean1, model2=compareLouvainLP$Mean2,
-          measure="vi", legend=c("Louvain", "LabelPropagation"))
-robinAUC(graph=g, model1=compareLouvainLP$Mean1, model2=compareLouvainLP$Mean2)
-
-# plotRobin(graph=g, model1=compare$Mean2, model2=compareLouvainLP$Mean2,
-#           measure="vi", legend=c("Infomap", "LabelPropagation"))
-
-```
 
 
 
@@ -436,7 +387,7 @@ ggplotly(ggplot(data=comments_per_day_wallstreetbets, aes(x=date)) +
                 y = "Comments"))
 ```
 
-In terms of number of different posts, we got between 1 and 10 post per day except for the the date 25.02.2021 in the wallstreetbets subreddit where we got 18 different posts.
+In terms of number of different posts, we got as expected 5 posts per day except for the the date 07.02.2021 in the stocks subreddit where we got just 1 post.
 
 ```{r post_subreddits, echo=FALSE }
 post_per_day_stocks <- getPostPerDay(databaseName,"stocks") %>%
