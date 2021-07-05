@@ -158,27 +158,30 @@ calls first check if the cached file contains all the relevant data.
 
 To examine the correlation between market data and sentiment, this measure has to be extracted from every comment.
 
-* For calculation of the sentiment the package  [sentimentr](https://cran.r-project.org/web/packages/sentimentr/sentimentr.pdf)
-* It uses a dictionary based approach and also takes modifiers and negators into account, which is a major advantage in comparison to the package [SentimentAnalysis](https://cran.r-project.org/web/packages/SentimentAnalysis/SentimentAnalysis.pdf) (finance specific dict!)
+For calculation of the sentiment the package  [sentimentr](https://cran.r-project.org/web/packages/sentimentr/sentimentr.pdf)
+It uses a dictionary based approach and also takes modifiers and negators into account, which is a major advantage in comparison to the package [SentimentAnalysis](https://cran.r-project.org/web/packages/SentimentAnalysis/SentimentAnalysis.pdf) (finance specific dict!)
 
 To consider the financial jargon used in these subreddits, the Loughran-McDonald dictionary is used for assigning polarity values to the words of a comment. The dictionary also has to be modified for the special slang of [r/wallstreetbets](www.reddit.com/r/wallstreetbets)
 
 ```{r}
+# adding and preparing the slang terms of wallstreetbets with their corresponding sentiment
 wsb_specific_terms <- data.frame(x=c("to the moon", "cant go tits up", "tendies", "diamond hands", "paper hands"), y=c(1,1,1,1,-1)) %>% as_key()
 
+# creating the modified polarity dictionary
 modified_dict <- lexicon::hash_sentiment_loughran_mcdonald %>% 
   update_polarity_table(x=wsb_specific_terms)
 
+# show a sample of positive and negative words of the dictionary
 print(modified_dict %>% filter(y>0) %>% sample_n(10))
 print(modified_dict %>% filter(y<0) %>% sample_n(10))
 ```
 
-```{r}
+```{r loading data}
 wsb <- loadData("reddit", "wallstreetbets")
 stocks <- loadData("reddit", "stocks")
 ```
 
-After adding the sentiment, we take a look at the the most positive and negative comments.
+After adding the sentiment, we take a look at the the most positive and negative comments of both subreddits.
 
 ```{r}
 print(stocks %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
@@ -188,20 +191,53 @@ print(wsb %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
 print(wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment))
 ```
 
-
 ### Ticker extraction
 
-To find the tickers each comment has mentioned a regular expression is used to identify stock symbols.
+To find tickers discussed in a comment, the corresponding symbols have to be extracted.
+
+Two approaches to achieve have been tried:
+
+1. Regex-based extraction:
+
+A regular expression can be used to find ticker mentions inside a comment. Ticker symbols are identified by assuming they are a two to four upper case  character long string preceeded and followed by zero or more non-alphanumeric characters, e.g. " GME." or " CDE".
 
 ```{r}
-stringr::str_match_all("I bought AMC and BB", '[^A-Za-z0-9]+([A-Z]{2,4})[^A-Za-z0-9]*')[[1]][,2]
+stringr::str_match_all(c("I bought AMC and BB", "I sold Palantir. PLTR was not the best stock to invest into"), '[^A-Za-z0-9]+([A-Z]{2,4})[^A-Za-z0-9]*')
 ```
 
-This regex extracts every two to four uppercase letter long sequences if it is lead and followed by a non-alphanumeric character.
+Disadvantages of this method are:
 
-Disadvantages of this method in comparison to a fixed dictionary are:
-  * False positives like "WSB" for Wallstreetbets or "ETF" for Exchange-traded fund. A remedy to this is an expansion of the regex or a subsequent filter on the most mentioned false positives.
-  * Actual company names are not recognized, so if GameStop gets mentioned, it is not detected as GME.
+  * False positives like "WSB" for Wallstreetbets or "ETF" for Exchange-traded fund. A remedy to this could an expansion of the regex or a subsequent filter on the most mentioned false positives.
+  * Actual company names are not recognized, so if "Palantir" gets mentioned, it is not detected as PLTR.
+
+These disadvantages can be remedied by using a dictionary-based approach.
+
+2. Dicitioary-based extraction:
+
+For this approach a list of all stock tickers traded on the NYSE is used. 
+
+```{r}
+nyse_lst <- read.csv("nyse_lst.csv")
+nyse_lst 
+```
+
+To save computing time, only the top 100 actively traded stocks are considered. The names of the companies are also modified, words and Phrases like "Ltd.", "Company", "Group", "Share" have been removed manually to capture the informally used phrases one would use to refer to these companies.
+In addition, tickers consisting of only one character are replaced with this modified name to avoid false matches, e.g. "F" for "Ford".
+
+```{r}
+nyse_lst_mod <- read.csv("nyse_lst_modified.csv")
+nyse_lst_mod
+```
+
+```{r}
+source("ticker_test.R")
+example_df <- data.frame(comment = c("I bought AMC and BB", "I sold Palantir. PLTR was not the best stock to invest into but GME was"), user = c("A", "B"))
+
+add_tickers_sentiment(example_df,
+                      ticker_list = nyse_lst_mod)$ticker
+```
+
+Using this approach, the ticker symbols as well as the names of the companies are extracted. In addition, false positives are avoided by only extracting symbols from the modified list.
 
 ### Community detection
 
@@ -213,7 +249,7 @@ For the community detection we used the library igraph. For this purpose the sub
 
 The weight of the edges is given by the number of interactions between the two users. A visual representation of the graph created by the comments between the dates 2021-01-23 and 2021-01-26 for the subreddit is presented in the following plot.  
 
-```{r graphcreation, echo=FALSE ,warning = FALSE}
+```{r graphcreation, echo=FALSE, warning = FALSE}
 
 initial_time <-"2021-01-23"
 end_time <-"2021-01-27"
@@ -321,10 +357,9 @@ ggplotly(ggplot(data=time_algorithms, aes(x=id_test))+
                  title = "Execution time per algorithm"))
 ```
 
-
 The execution time for the tests was very similar for Label Propagation and Louvain. Whereas the execution time for Infomap is higher and it tends to increase as we process more data. Even though it is possible to find these differences between the execution time, it is not a determinant factor to select the clustering algorithm.  
 
-Considering these tests, we selected Louvain as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm. 
+Considering these tests, we selected Louvain as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm.
 
 ```{r cluster_example}
 #create communities
@@ -343,7 +378,6 @@ visNetwork(nodes, edges)%>%
   visInteraction(navigationButtons = TRUE) %>%
   visPhysics(maxVelocity = 1,repulsion = list(centralGravity=-0.5,springLength=500)) 
 ```
-
 
 To analyze the content of the comments for each cluster, we inspect some random clusters to find the most common words, which are displayed in the following wordclouds. For some clusters we can find that they use quite often the same words like "stocks" and "buy", but we also observed that the most frequent words in each cluster are different. In this example, for the selected clusters the most frequent words are "gme", "short", "fidelity" and "restricted".
 
@@ -365,6 +399,63 @@ get_word_cloud_community(raw_data,communities(lc),10)
 
 Initially we explore how the data is distributed in both reddits by getting the number of comments and posts per day. In general, the number of comments per day oscillates between 5 comment and 1039. For the week between 20.03.2021 and 27.03.2021 between 1 and 4 comments were retrieved. This difference was generated by the API used in the extraction. 
 
+### Tickers
+
+```{r}
+wsb_ticker <- wsb %>%
+  filter(length(ticker)!=0) %>%
+  pull(ticker) %>%
+  unlist() %>%
+  trimws() %>%
+  paste0(collapse = ",") %>%
+  strsplit(",") %>%
+  table() %>%
+  as.data.frame() %>%
+  rename(., "ticker"=".") %>%
+  arrange(desc(Freq)) %>%
+  head()
+
+stocks_ticker <- stocks %>%
+  filter(length(ticker)!=0) %>%
+  pull(ticker) %>%
+  unlist() %>%
+  trimws() %>%
+  paste0(collapse = ",") %>%
+  strsplit(",") %>%
+  table() %>%
+  as.data.frame() %>%
+  rename(., "ticker"=".") %>%
+  arrange(desc(Freq)) %>%
+  head()
+
+plot_wsb <- ggplotly(ggplot(wsb_ticker, aes(x=reorder(ticker, (-Freq)), y=Freq)) +
+           geom_col() +
+           labs(x="Ticker", y="Count", title="Count of Tickers for r/wallstreetbets"))
+
+plot_stocks <- ggplotly(ggplot(stocks_ticker, aes(x=reorder(ticker, (-Freq)), y=Freq)) +
+           geom_col() +
+           labs(x="Ticker", y="Count", title="Count of Tickers for r/stocks"))
+
+subplot(plot_wsb, plot_stocks)
+```
+```{r}
+count_per_week <- function(dat, ticker_list){
+  res_lst <- list()
+  for (t in ticker_list){
+    res_lst[[t]] <- dat %>%
+      filter(t %in% ticker) %>%
+      group_by("CW" = paste0(lubridate::week(comm_date), "/", lubridate::year(comm_date))) %>%
+      summarise(count=n(), ticker=t)
+  }
+  return(dplyr::bind_rows(res_lst))
+}
+
+tickers_week <- count_per_week(wsb, wsb_ticker$ticker)
+```
+
+
+
+### 
 ```{r comments_subreddits, echo=FALSE }
 comments_per_day_stocks <-getCommentsPerDay(databaseName,"stocks") %>%
   mutate(subreddit = "Stocks")
@@ -411,9 +502,8 @@ ggplotly(ggplot(data=post_per_day_wallstreetbets, aes(x=date)) +
 
 ### User's interaction in subreddits
 
-
 ```{r}
-active_users <-merge(getActiveUsers("stocks"),
+active_users <- merge(getActiveUsers("stocks"),
                   getActiveUsers("wallstreetbets"),
                   by='_id', all = TRUE) %>%
   rename(comments_stocks = comments.x, comments_wsb = comments.y, name_user = '_id') %>%
@@ -441,12 +531,10 @@ ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
         panel.border = element_blank(),
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        plot.title=element_text(size=14, face="bold"))+
+        plot.title=element_text(size=14, face="bold")) +
   geom_text(aes(y = prop/7 + c(0, cumsum(prop)[-length(prop)]), 
                 label = percent(prop/100)), size=5)
 ```
-
-
 
 
 *What visualizations did you use to look at your data in different ways?*
