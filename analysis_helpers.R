@@ -5,7 +5,7 @@ library(forecast)
 library(plotly)
 library(imputeTS)
 
-stocks <- readRDS("stocks.Rds")
+#stocks <- readRDS("stocks.Rds")
 #stocks <- loadData("reddit", "wallstreetbets")
 prepare_analysis <- function(df, topn=10, blacklist=NULL){
   mentioned_tickers <- df$ticker %>%
@@ -30,12 +30,14 @@ prepare_analysis <- function(df, topn=10, blacklist=NULL){
     print(t)
     tmp_reddit <- df %>%
       filter(t %in% ticker) %>%
-      mutate(sentiment= case_when(sentiment < 0 ~ -1, sentiment > 0 ~ 1)) %>%
       group_by("date"=lubridate::date(comm_date)) %>%
       summarise(sentiment = mean(sentiment, na.rm = T), sent_vol = n())
     tmp_joined <- l.out$df.tickers %>%
       filter(ticker==t) %>%
-      left_join(tmp_reddit, by=c("ref.date"="date"))
+      left_join(tmp_reddit, by=c("ref.date"="date")) %>%
+      arrange(ref.date) %>%
+      mutate(roll_sentiment=zoo::rollmeanr(sentiment, 3, na.pad=T, fill=0))
+    
     if (nrow(tmp_joined)!=0){
       res_list[[t]] <- tmp_joined
     }
@@ -44,58 +46,90 @@ prepare_analysis <- function(df, topn=10, blacklist=NULL){
   return(res_list)
 }
 
-analysis <- function(df_lst){
+ccf_by_price_vol <- function(df_lst, na.action = na.pass){
   res_lst <- list()
   for (ticker in names(df_lst)){
-    print(ticker)
-    df_stock <- df_lst[[ticker]] %>%
-      arrange(ref.date) %>%
-      mutate(lag_sentiment = lag(sentiment), (sentiment-lag_sentiment)/lag_sentiment)
+    df_stock <- df_lst[[ticker]]
+      
+    sentiment_ts <- df_stock$sentiment
+    price_ts <- df_stock$ret.adjusted.prices
+    volume_ts <- df_stock$volume
     
-    sentiment_ts <- df_stock$sentiment %>% na_seadec()
-    price_ts <- df_stock$ret.adjusted.prices %>% na_seadec()
-    volume_ts <- df_stock$volume %>% na_seadec()
-    res_lst[[ticker]][["price"]] <- ccf(sentiment_ts, price_ts, lag.max = 10, plot=F)
-    res_lst[[ticker]][["volume"]] <- ccf(sentiment_ts, volume_ts, lag.max = 10, plot=F)
+    res_lst[[ticker]][["price"]] <- ccf(sentiment_ts, price_ts, lag.max = 5, plot=F, na.action = na.action)
+    res_lst[[ticker]][["volume"]] <- ccf(sentiment_ts, volume_ts, lag.max = 5, plot=F, na.action = na.action)
   }
   return(res_lst)
 }  
 
-plot_analysis <- function(ccf_lst){
+plot_ccf <- function(ccf_lst){
   plot_lst <- list()
   for (ticker in names(ccf_lst)){
     print(ticker)
     plot_lst[[paste0(ticker, "_price")]] <- (ccf_lst[[ticker]][["price"]] %>% 
       autoplot() +
-      scale_x_continuous(breaks = seq(-10, 10))) %>% 
+      scale_x_continuous(breaks = seq(-5, 5))) %>% 
       plotly::ggplotly() %>%
-      layout(annotations = list(x = 0.2 , y = 1.2, text = paste0(ticker, " Sentiment/Price"), showarrow = F,
+      layout(annotations = list(x = 0.5 , y = 1.2, text = paste0(ticker, " Sentiment/Price"), showarrow = F,
                                 xref='paper', yref='paper'))
 
     plot_lst[[paste0(ticker, "_volume")]] <- (ccf_lst[[ticker]][["volume"]] %>% 
       autoplot() +
-      scale_x_continuous(breaks = seq(-10, 10))) %>%
+      scale_x_continuous(breaks = seq(-5, 5))) %>%
       plotly::ggplotly() %>%
-      layout(annotations = list(x = 0.8 , y = 1.2, text = paste0(ticker, " Sentiment/Volume"), showarrow = F,
+      layout(annotations = list(x = 0.5 , y = 1.2, text = paste0(ticker, " Sentiment/Volume"), showarrow = F,
                                 xref='paper', yref='paper'))
     
   }
   return(plot_lst)
 }
 
-prep_stocks <- prepare_analysis(stocks)
-ccf_stocks <- analysis(prep_stocks)
-plot_list <- plot_analysis(ccf_stocks)
+prep_stocks <- prepare_analysis(wsb2)
+ccf_stocks <- ccf_by_price_vol(prep_stocks)
+plot_list <- plot_ccf(ccf_stocks)
 subplot(plot_list, nrows = length(plot_list)/2)
 
-prepare_analysis(wsb_mod) %>% analysis() %>% plot_analysis %>% subplot(., nrows = length(.)/2)
-lapply(names(ccf_stocks), function(x) {ccf_stocks[[x]]$price[[1]]}) %>%
-purrr::reduce(cbind) %>%
-magrittr::set_colnames(names(ccf_stocks)) %>%
-as.data.frame() %>%
-rowwise() %>%
-mutate(rowMean = mean(c_across())) %>%
-ungroup() %>%
-mutate(lag=seq(-10, 10))
+plots <- prepare_analysis(wsb2) %>% analysis() %>% plot_analysis()
 
 
+ccf_table <- function(cff_output) {
+  tmp_table <- lapply(names(cff_output), function(x) {cff_output[[x]]$price[[1]]}) %>%
+    purrr::reduce(cbind) %>%
+    magrittr::set_colnames(names(cff_output)) %>%
+    as.data.frame() %>%
+    rowwise() %>%
+    mutate(rowMean = mean(c_across())) %>%
+    ungroup() %>%
+    mutate(lag=seq(-5, 5)) %>%
+    round(2) %>%
+    select(lag, everything(), rowMean) %>%
+    t() %>% as.data.frame()
+  colnames()
+  return(tmp_table)
+}
+
+plot_ts <- function(dat, symbol) {
+  dat <- prepare_analysis(dat)
+  
+  fig1 <- dat[[symbol]] %>%
+    plot_ly(x = ~ref.date, type="candlestick",
+            open = ~price.open, close = ~price.close,
+            high = ~price.high, low = ~price.low) %>%
+    layout(xaxis = list(rangeslider = list(visible = F)), title=paste0(symbol))
+  
+  ay <- list(
+    overlaying = "y2",
+    side = "right"
+  )
+  
+  fig2 <- dat[[symbol]] %>%
+    plot_ly() %>%
+    add_trace(x=~ref.date, y=~roll_sentiment, name="sentiment", type="scatter", mode="line")
+
+  fig3 <- dat[[symbol]] %>%
+    plot_ly() %>%
+    add_trace(x=~ref.date, y=~sent_vol, name="vol_sentiment", type="bar")
+
+
+  
+  subplot(fig1, fig2, fig3, nrows=3, shareX = T)
+}
