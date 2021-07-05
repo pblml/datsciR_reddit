@@ -29,6 +29,8 @@ prepare_analysis <- function(df, topn=10, blacklist=NULL){
     tmp_reddit <- df %>%
       filter(t %in% ticker) %>%
       group_by("date"=lubridate::date(comm_date)) %>%
+      mutate(sentiment = case_when(sentiment > 0 ~ 1,
+                                   sentiment < 0 ~ -1)) %>%
       summarise(sentiment = mean(sentiment, na.rm = T), sent_vol = n())
     tmp_joined <- l.out$df.tickers %>%
       filter(ticker==t) %>%
@@ -66,14 +68,14 @@ plot_ccf <- function(ccf_lst){
       autoplot() +
       scale_x_continuous(breaks = seq(-5, 5))) %>% 
       plotly::ggplotly() %>%
-      layout(annotations = list(x = 0.5 , y = 1.2, text = paste0(ticker, " Sentiment/Price"), showarrow = F,
+      layout(annotations = list(x = 0.3 , y = 1.2, text = paste0(ticker, " Sentiment/Price"), showarrow = F,
                                 xref='paper', yref='paper'))
 
     plot_lst[[paste0(ticker, "_volume")]] <- (ccf_lst[[ticker]][["volume"]] %>% 
       autoplot() +
       scale_x_continuous(breaks = seq(-5, 5))) %>%
       plotly::ggplotly() %>%
-      layout(annotations = list(x = 0.5 , y = 1.2, text = paste0(ticker, " Sentiment/Volume"), showarrow = F,
+      layout(annotations = list(x = 0.8 , y = 1.2, text = paste0(ticker, " Sentiment/Volume"), showarrow = F,
                                 xref='paper', yref='paper'))
     
   }
@@ -92,7 +94,6 @@ ccf_table <- function(cff_output) {
     round(2) %>%
     select(lag, everything(), rowMean) %>%
     t() %>% as.data.frame()
-  colnames()
   return(tmp_table)
 }
 

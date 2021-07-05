@@ -184,21 +184,37 @@ stocks <- loadData("reddit", "stocks")
 After adding the sentiment, we take a look at the the most positive and negative comments of both subreddits.
 
 ```{r}
-print(stocks %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
-print(stocks %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment))
+stocks %>% arrange(sentiment) %>% head() %>% select(comment, sentiment) %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
 
-print(wsb %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
-print(wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment))
+stocks %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment) %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
+
+wsb %>% arrange(sentiment) %>% head() %>% select(comment, sentiment) %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
+
+wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment) %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
 ```
 
 Since we are only interested in if a stock is positive, negative or neutral, the values are recoded to 1, -1 and 0 respectively.
 ```{r}
-
+wsb <- wsb %>% mutate(sentiment = case_when(sentiment > 0 ~ 1,
+                                            sentiment < 0 ~ -1))
+stocks <- stocks %>% mutate(sentiment = case_when(sentiment > 0 ~ 1,
+                                            sentiment < 0 ~ -1))
 ```
 
 
-
-### Ticker extraction
+### Ticker Extraction
 
 To find tickers discussed in a comment, the corresponding symbols have to be extracted.
 
@@ -225,7 +241,10 @@ For this approach a list of all stock tickers traded on the NYSE is used.
 
 ```{r}
 nyse_lst <- read.csv("nyse_lst.csv")
-nyse_lst 
+nyse_lst %>% 
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
 ```
 
 To save computing time, only the top 100 actively traded stocks are considered. The names of the companies are also modified, words and Phrases like "Ltd.", "Company", "Group", "Share" have been removed manually to capture the informally used phrases one would use to refer to these companies.
@@ -233,10 +252,14 @@ In addition, tickers consisting of only one character are replaced with this mod
 
 ```{r}
 nyse_lst_mod <- read.csv("nyse_lst_modified.csv")
-nyse_lst_mod
+nyse_lst_mod %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
 ```
+To add this information, a helper function was written which adds columns for sentiment and the mentioned tickers respectively.
 
-```{r}
+```{r tickerExtractionExample}
 source("ticker_test.R")
 example_df <- data.frame(comment = c("I bought AMC and BB", "I sold Palantir. PLTR was not the best stock to invest into but GME was"), user = c("A", "B"))
 
@@ -462,6 +485,7 @@ plot_wsb
 plot_stocks
 
 ```
+
 ```{r}
 count_per_week <- function(dat, ticker_list){
   res_lst <- list()
@@ -550,7 +574,6 @@ active_users <- merge(getActiveUsers("stocks"),
   mutate(type_participation = ifelse(comments_stocks>0 & comments_wsb>0,"Both subreddits",
                          ifelse(comments_stocks>0,"Stocks","Wallstreetbets")))
 
-# ggplot(active_users, aes(x=participation)) + geom_histogram(bins = 50)
 
 summary_users <- active_users %>%
   group_by(type_participation) %>%
@@ -583,16 +606,29 @@ ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
 To answer the the question, if the sentiment towards a specific ticker has an influence on market data, cross-correlation between the sentiment and the percentage change of the price is used.
 During the cross-correlation time series are lagged against each other, so that the  $t - lag$ values of one time series are correlated against the values of the other time series at time $t$.
 
-Since the mentioned tickers are quite sparse, missing sentiment values are handled by `r na.pass`, so they are not considered in the calculation, but simply passed through. Imputation is also not feasable, since sentiment values are often not available for longer time spans.
+Since the mentioned tickers are quite sparse, only the top 10 mentioned tickers are used and missing sentiment values are handled by `r na.pass`, so they are not considered in the calculation, but simply passed through.
+Imputation of the missing values is also not feasable, since sentiment values are often not available for longer time spans.
 
+The results are visualized using the ACF plots which are returned by the `r ccf` function. It shows the correlation of the two time series depending on the lag, including 95% confidence intervals.
 
 
 The results for correlating the sentiment against the adjusted price returns are shown below.
 
 ```{r}
 source("analysis_helpers.R")
-stocks_prep <- prepare_analysis(stocks) %>% ccf_by_price_vol() %>% ccf_table()
+stocks_prep <- prepare_analysis(stocks) 
 wsb_prep <- prepare_analysis(wsb)
+```
+```{r}
+stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.05)
+```
+```{r}
+wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2)
+```
+
+
+```{r}
+
 
 stocks_prep %>%
   ccf_by_price_vol() %>%
