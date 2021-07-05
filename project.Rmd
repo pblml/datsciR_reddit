@@ -357,10 +357,19 @@ ggplotly(ggplot(data=time_algorithms, aes(x=id_test))+
                  title = "Execution time per algorithm"))
 ```
 
-Additionally to the previous test in separated samples, we assessed the robustness of Louvain using the library robin [@policastro2021robustness] for the whole data for each subreddit. 
+In addition to the previous test in separated samples, we assessed the robustness of Louvain using the library robin [@policastro2021robustness] for the whole data for each subreddit. 
 
-To test the goodness of the communities detected by Louvain in the each complete subreddit we followed the first workflow from Robin, where the stability of the algorithm is compared against random perturbations of the original graph. The stability measure we chose was VI metric. The results from this evaluation are in the next two plots.
+To test the goodness of the communities detected by Louvain in the each complete subreddit we followed the first workflow from robin, where the stability of the algorithm is compared against random perturbations of the original graph. The stability measure we chose was VI metric. The results from this evaluation are in the next plots.
 
+![](robinEvaluation/Stocks_robust_louvain.jpeg )
+![](robinEvaluation/WSB_robust_louvain.jpeg )
+
+For both datasets the stability measure curves for Louvain compared to the null model are very close. For the stock the AUC values we got where **0.2631427** for the real data and **0.2494959** for the null model. On the other hand for wallstreetbets the AUC values we got where **0.2357264** for the real data and **0.2471575** for the null model.
+
+When we compare with robin the best two algorithms from our first tests (Louvain and Label Propagation) is possible to back up the findings that Louvain performs better for both subreddit datasets.
+
+![](robinEvaluation/Stocks_louvain_vs_lp.jpeg )
+![](robinEvaluation/WSB_louvain_vs_lp.jpeg )
 
 Considering these tests, we selected Louvain as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm.
 

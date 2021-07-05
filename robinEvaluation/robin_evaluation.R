@@ -79,7 +79,8 @@ jpeg(filename="Stocks_louvain_vs_lp.jpeg")
 plotRobin(graph=graph_stocks, 
           model1=compareLouvainLP$Mean1, 
           model2=compareLouvainLP$Mean2,
-          measure="vi", legend=c("Louvain", "LabelPropagation"))
+          measure="vi", legend=c("Louvain", "LabelPropagation"),
+          title = "Robin plot Stocks")
 dev.off()
 
 robinAUC_louvain_lp <- robinAUC(graph=graph_stocks, 
@@ -158,7 +159,7 @@ robinFDATest(graph=graph_wsb, model1=robust_wsb_louvain$Mean,
              measure="vi",legend=c("Real Data", "Null Model"))
 
 #store plot
-jpeg(filename="Stocks_adjust_pvalues_louvain.jpeg")
+jpeg(filename="WSB_adjust_pvalues_louvain.jpeg")
 robinFDATest(graph=graph_wsb, model1=robust_wsb_louvain$Mean, 
              model2=robust_wsb_louvain$MeanRandom,
              measure="vi",legend=c("Real Data", "Null Model"))
