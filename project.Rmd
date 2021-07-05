@@ -416,7 +416,7 @@ wsb_ticker <- wsb %>%
   as.data.frame() %>%
   rename(., "ticker"=".") %>%
   arrange(desc(Freq)) %>%
-  head()
+  head(10)
 
 stocks_ticker <- stocks %>%
   filter(length(ticker)!=0) %>%
@@ -429,7 +429,7 @@ stocks_ticker <- stocks %>%
   as.data.frame() %>%
   rename(., "ticker"=".") %>%
   arrange(desc(Freq)) %>%
-  head()
+  head(10)
 
 plot_wsb <- ggplotly(ggplot(wsb_ticker, aes(x=reorder(ticker, (-Freq)), y=Freq)) +
            geom_col() +
@@ -453,7 +453,19 @@ count_per_week <- function(dat, ticker_list){
   return(dplyr::bind_rows(res_lst))
 }
 
-tickers_week <- count_per_week(wsb, wsb_ticker$ticker)
+tickers_week_wsb <- count_per_week(wsb2, wsb_ticker$ticker)
+tickers_week_stocks <- count_per_week(stocks2, stocks_ticker$ticker)
+```
+```{r}
+ggplot(tickers_week_wsb, aes(x=CW, y=count)) +
+  geom_col(position = "dodge") +
+  theme(axis.text.x=element_text(angle = -45, hjust = 0)) +
+  facet_grid(ticker~.)
+
+ggplot(tickers_week_stocks, aes(x=CW, y=count)) +
+  geom_col(position = "dodge") +
+  theme(axis.text.x=element_text(angle = -45, hjust = 0)) +
+  facet_grid(ticker~.)
 ```
 
 
