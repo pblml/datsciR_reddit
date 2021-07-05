@@ -191,6 +191,13 @@ print(wsb %>% arrange(sentiment) %>% head() %>% select(comment, sentiment))
 print(wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment))
 ```
 
+Since we are only interested in if a stock is positive, negative or neutral, the values are recoded to 1, -1 and 0 respectively.
+```{r}
+
+```
+
+
+
 ### Ticker extraction
 
 To find tickers discussed in a comment, the corresponding symbols have to be extracted.
@@ -237,7 +244,7 @@ add_tickers_sentiment(example_df,
                       ticker_list = nyse_lst_mod)$ticker
 ```
 
-Using this approach, the ticker symbols as well as the names of the companies are extracted. In addition, false positives are avoided by only extracting symbols from the modified list.
+Using this approach, the ticker symbols as well as the names of the companies are extracted. In addition, false positives are avoided by only extracting symbols mentioned in the modified list.
 
 ### Community detection
 
@@ -414,6 +421,10 @@ Initially we explore how the data is distributed in both reddits by getting the 
 ### Tickers
 
 ```{r}
+par(mfrow=c(1,2),
+    oma = c(0,0,0,0),
+    mar = c(0,0,0,0))
+
 wsb_ticker <- wsb %>%
   filter(length(ticker)!=0) %>%
   pull(ticker) %>%
@@ -447,8 +458,9 @@ plot_wsb <- ggplotly(ggplot(wsb_ticker, aes(x=reorder(ticker, (-Freq)), y=Freq))
 plot_stocks <- ggplotly(ggplot(stocks_ticker, aes(x=reorder(ticker, (-Freq)), y=Freq)) +
            geom_col() +
            labs(x="Ticker", y="Count", title="Count of Tickers for r/stocks"))
+plot_wsb
+plot_stocks
 
-subplot(plot_wsb, plot_stocks)
 ```
 ```{r}
 count_per_week <- function(dat, ticker_list){
@@ -462,8 +474,8 @@ count_per_week <- function(dat, ticker_list){
   return(dplyr::bind_rows(res_lst))
 }
 
-tickers_week_wsb <- count_per_week(wsb2, wsb_ticker$ticker)
-tickers_week_stocks <- count_per_week(stocks2, stocks_ticker$ticker)
+tickers_week_wsb <- count_per_week(wsb, wsb_ticker$ticker)
+tickers_week_stocks <- count_per_week(stocks, stocks_ticker$ticker)
 ```
 ```{r}
 ggplot(tickers_week_wsb, aes(x=CW, y=count)) +
@@ -567,6 +579,37 @@ ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
 *How did you reach these conclusions?*
 
 # Final Analysis
+
+To answer the the question, if the sentiment towards a specific ticker has an influence on market data, cross-correlation between the sentiment and the percentage change of the price is used.
+During the cross-correlation time series are lagged against each other, so that the  $t - lag$ values of one time series are correlated against the values of the other time series at time $t$.
+
+Since the mentioned tickers are quite sparse, missing sentiment values are handled by `r na.pass`, so they are not considered in the calculation, but simply passed through. Imputation is also not feasable, since sentiment values are often not available for longer time spans.
+
+
+
+The results for correlating the sentiment against the adjusted price returns are shown below.
+
+```{r}
+source("analysis_helpers.R")
+stocks_prep <- prepare_analysis(stocks) %>% ccf_by_price_vol() %>% ccf_table()
+wsb_prep <- prepare_analysis(wsb)
+
+stocks_prep %>%
+  ccf_by_price_vol() %>%
+  ccf_table() %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
+
+wsb_prep %>%
+  ccf_by_price_vol() %>%
+  ccf_table() %>%
+  kbl() %>%
+  kable_material(c("hover")) %>%
+  kable_styling(full_width = FALSE)
+
+```
+
 
 *What did you learn about the data?*
 *How did you answer the questions?*
