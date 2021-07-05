@@ -2,6 +2,7 @@
 library(shiny)
 library(shinythemes)
 require(visNetwork)
+require(plotly)
 
 # Define UI for application that draws a histogram
 shinyUI(
@@ -28,7 +29,8 @@ shinyUI(
                     ),
             tabPanel(title = "Reddit Data",
                      ""),
-            tabPanel(title = "Community Detection",
+            tabPanel(title = "Community Detection",""),
+            tabPanel(title = "Interactive Community creation",
                      sidebarLayout(
                          sidebarPanel(
                              dateRangeInput("daterange1", "Date range:",
@@ -38,17 +40,17 @@ shinyUI(
                                             max    = "2021-06-20"),
                              selectInput("subreddit", "Subreddit:",
                                          c("Stocks" = "stocks",
-                                           "Wallstreetbets" = "wallstreetbets"))
+                                           "Wallstreetbets" = "wallstreetbets")),
+                             selectInput("symbol", "Ticker Symbol", choices=c("AMC", "TSLA", "PLTR"))
                          ),
                          
                          # Show a plot of the generated distribution
                          mainPanel(
-                             visNetworkOutput("clusterVisualizarion")
-                             #plotOutput("distPlot")
+                             visNetworkOutput("clusterVisualizarion"),
+                             plotlyOutput("nodes_data_from_shiny")
                          )
                      )),
-            tabPanel(title = "Stock Analysis",
-                     ""),
+            tabPanel(title = "Stock Analysis",""),
             tabPanel(title = "Resources",
                      "")
         ),

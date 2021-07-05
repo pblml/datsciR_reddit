@@ -18,6 +18,25 @@ loadData <- function(databaseName,collectionName) {
   data
 }
 
+loadDataCol <- function(databaseName,collectionName) {
+  # Connect to the database
+  db <- mongo(collection = collectionName,
+              url = sprintf(
+                "mongodb+srv://%s:%s@%s/%s",
+                options()$mongodb$username,
+                options()$mongodb$password,
+                options()$mongodb$host,
+                databaseName
+              ),
+              options = ssl_options(weak_cert_validation = TRUE))
+  # Read all the entries
+  data <- db$find(fields='{"comm_date":1,
+                            "subreddit":1,
+                  "sentiment":1,
+                  "ticker":1}')
+  data
+}
+
 loadDataDates <- function(databaseName,collectionName,initial_date, final_date) {
   # Connect to the database
   db <- mongo(collection = collectionName,

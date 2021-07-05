@@ -3,7 +3,6 @@ library(ggplot2)
 library(BatchGetSymbols)
 library(forecast)
 library(plotly)
-library(imputeTS)
 
 #stocks <- readRDS("stocks.Rds")
 #stocks <- loadData("reddit", "wallstreetbets")
@@ -27,7 +26,6 @@ prepare_analysis <- function(df, topn=10, blacklist=NULL){
                                                     'BGS_Cache'))
   res_list <- list()
   for (t in mentioned_tickers) {
-    print(t)
     tmp_reddit <- df %>%
       filter(t %in% ticker) %>%
       group_by("date"=lubridate::date(comm_date)) %>%
@@ -64,7 +62,6 @@ ccf_by_price_vol <- function(df_lst, na.action = na.pass){
 plot_ccf <- function(ccf_lst){
   plot_lst <- list()
   for (ticker in names(ccf_lst)){
-    print(ticker)
     plot_lst[[paste0(ticker, "_price")]] <- (ccf_lst[[ticker]][["price"]] %>% 
       autoplot() +
       scale_x_continuous(breaks = seq(-5, 5))) %>% 
@@ -82,14 +79,6 @@ plot_ccf <- function(ccf_lst){
   }
   return(plot_lst)
 }
-
-prep_stocks <- prepare_analysis(wsb2)
-ccf_stocks <- ccf_by_price_vol(prep_stocks)
-plot_list <- plot_ccf(ccf_stocks)
-subplot(plot_list, nrows = length(plot_list)/2)
-
-plots <- prepare_analysis(wsb2) %>% analysis() %>% plot_analysis()
-
 
 ccf_table <- function(cff_output) {
   tmp_table <- lapply(names(cff_output), function(x) {cff_output[[x]]$price[[1]]}) %>%
@@ -131,5 +120,5 @@ plot_ts <- function(dat, symbol) {
 
 
   
-  subplot(fig1, fig2, fig3, nrows=3, shareX = T)
+  return(subplot(fig1, fig2, fig3, nrows=3, shareX = T))
 }

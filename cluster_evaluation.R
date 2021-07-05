@@ -132,29 +132,29 @@ clustering_evaluation <-
   }
 
 
-#data selected for evaluation of clusters
-evaluations <- data.frame(
-  test = 1:4,
-  collectionName = c("wallstreetbets", "stocks", "wallstreetbets", "stocks"),
-  initial_time = c("2021-02-03", "2020-11-03", "2021-01-03", "2021-01-03"),
-  end_time = c("2021-02-05", "2020-11-07", "2021-01-07", "2021-01-13"),
-  number_comments = rep(NA, 4)
-)
-
-result <- data.frame()
-for (i in 1:nrow(evaluations)) {
-  row <- evaluations[i, ]
-  result_evaluation <-
-    clustering_evaluation(row$test,
-                          "reddit",
-                          row$collectionName,
-                          row$initial_time,
-                          row$end_time)
-  #update number of comments per test
-  evaluations[[i, "number_comments"]] <-
-    result_evaluation$number_comments
-  result <- rbind(result, result_evaluation$df)
-}
+# #data selected for evaluation of clusters
+# evaluations <- data.frame(
+#   test = 1:4,
+#   collectionName = c("wallstreetbets", "stocks", "wallstreetbets", "stocks"),
+#   initial_time = c("2021-02-03", "2020-11-03", "2021-01-03", "2021-01-03"),
+#   end_time = c("2021-02-05", "2020-11-07", "2021-01-07", "2021-01-13"),
+#   number_comments = rep(NA, 4)
+# )
+# 
+# result <- data.frame()
+# for (i in 1:nrow(evaluations)) {
+#   row <- evaluations[i, ]
+#   result_evaluation <-
+#     clustering_evaluation(row$test,
+#                           "reddit",
+#                           row$collectionName,
+#                           row$initial_time,
+#                           row$end_time)
+#   #update number of comments per test
+#   evaluations[[i, "number_comments"]] <-
+#     result_evaluation$number_comments
+#   result <- rbind(result, result_evaluation$df)
+# }
 
 
 #Additional functions over generated communities
