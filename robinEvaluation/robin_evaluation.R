@@ -183,7 +183,8 @@ compareLouvainLP <- robinCompare(graph=graph_wsb, method1="louvain",
 plotRobin_louvain_lp <- plotRobin(graph=graph_wsb, 
                                   model1=compareLouvainLP$Mean1, 
                                   model2=compareLouvainLP$Mean2,
-                                  measure="vi", legend=c("Louvain", "LabelPropagation"))
+                                  measure="vi", legend=c("Louvain", "LabelPropagation"),
+                                  title="Robin plot Wallstreetbets")
 
 jpeg(filename="Stocks_louvain_vs_lp.jpeg")
 plotRobin(graph=graph_wsb, 

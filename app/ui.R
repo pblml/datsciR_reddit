@@ -10,7 +10,7 @@ shinyUI(
         # tags$head(
         #     tags$link(rel = "stylesheet", type = "text/css", href = "bootstrap.css")
         # ),
-        theme = shinytheme("cerulean"),
+        theme = shinytheme("united"),
         title = "Reddit communities",
         tags$div(class = "title",
                  tags$h1("Analysis Reddit communities"),),
@@ -22,7 +22,7 @@ shinyUI(
                     tags$h2("Research questions"),
                     tags$h4("1. How can we identify subcommunities inside subreddit and which measures can be used to evaluate the subcommunities?"),
                     tags$p("A subreddit is already a big community inside Reddit, which allows the interaction between users. It is important to represent the interaction from the users in order to find relations and smaller clusters from users which we can analyze afterwards."),
-                    tags$h4("2. Is it possible to identify stocks that are discussed in each subcommunity and the sentiment related to the stocks?"),
+                    tags$h4("2. How can we identify stocks that are discussed in each subcommunity and the sentiment related to the stocks?"),
                     tags$p("For this question we would like to find strategies that allows us to identify the stocks that are mentioned inside each community and the sentiment (positive, negative or neutral) towards the stocks."),
                     tags$h4("3. Based on the stocks and sentiments towards them inside the communities, is it possible to find a correlation with the stock prices?"),
                     tags$p("Considering the Gamestop event we would like to find out if there are relations between the sentiment that the users express in the subreddit towards a stock with the real stock prices.")
@@ -46,8 +46,10 @@ shinyUI(
                          
                          # Show a plot of the generated distribution
                          mainPanel(
-                             visNetworkOutput("clusterVisualizarion"),
-                             plotlyOutput("nodes_data_from_shiny")
+                             shinycssloaders::withSpinner(
+                                 visNetworkOutput("clusterVisualizarion")),
+                                 plotlyOutput("nodes_data_from_shiny")
+                             
                          )
                      )),
             tabPanel(title = "Stock Analysis",""),

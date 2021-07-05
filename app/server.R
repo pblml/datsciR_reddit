@@ -13,6 +13,10 @@ source("../DB_connection.R", chdir = T)
 source("../analysis_helpers.R", chdir = T)
 
 dat <- rbind(loadDataCol("reddit", "wallstreetbets"), loadDataCol("reddit", "stocks"))
+#dat <- readRDS("../stocks.Rds",chdir=T)
+#wsb <- readRDS("../wsb.Rds")
+#dat<- readRDS("../full_data.Rds")#rbind(stocks,wsb)
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {

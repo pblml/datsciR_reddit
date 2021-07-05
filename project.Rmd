@@ -351,6 +351,29 @@ source("cluster_evaluation.R")
 
 
 ```{r cluster_evaluation, echo=FALSE, warning=FALSE}
+evaluations <- data.frame(
+  test = 1:4,
+  collectionName = c("wallstreetbets", "stocks", "wallstreetbets", "stocks"),
+  initial_time = c("2021-02-03", "2020-11-03", "2021-01-03", "2021-01-03"),
+  end_time = c("2021-02-05", "2020-11-07", "2021-01-07", "2021-01-13"),
+  number_comments = rep(NA, 4)
+)
+
+result <- data.frame()
+for (i in 1:nrow(evaluations)) {
+  row <- evaluations[i, ]
+  result_evaluation <-
+    clustering_evaluation(row$test,
+                          "reddit",
+                          row$collectionName,
+                          row$initial_time,
+                          row$end_time)
+  #update number of comments per test
+  evaluations[[i, "number_comments"]] <-
+    result_evaluation$number_comments
+  result <- rbind(result, result_evaluation$df)
+}
+
 kbl(evaluations,
     col.names = c("Test",
                   "Collection Name",
@@ -391,12 +414,17 @@ In addition to the previous test in separated samples, we assessed the robustnes
 
 To test the goodness of the communities detected by Louvain in the each complete subreddit we followed the first workflow from robin, where the stability of the algorithm is compared against random perturbations of the original graph. The stability measure we chose was VI metric. The results from this evaluation are in the next plots.
 
-![](robinEvaluation/Stocks_robust_louvain.jpeg )
-![](robinEvaluation/WSB_robust_louvain.jpeg )
+![](robinEvaluation/Stocks_adjust_pvalues_louvain.jpeg )
 
-For both datasets the stability measure curves for Louvain compared to the null model are very close. For the stock the AUC values we got where **0.2631427** for the real data and **0.2494959** for the null model. On the other hand for wallstreetbets the AUC values we got where **0.2357264** for the real data and **0.2471575** for the null model.
+*Stocks subreddit*
 
-When we compare with robin the best two algorithms from our first tests (Louvain and Label Propagation) is possible to back up the findings that Louvain performs better for both subreddit datasets.
+![](robinEvaluation/WSB_adjust_pvalues_louvain.jpeg )
+
+*Wallstreetbets subreddit*
+
+For both datasets the stability measure curves for Louvain compared to the null model are very close. For the stocks subreddit the AUC values we got were **0.2631427** for the real data and **0.2494959** for the null model and for the wallstreetbets subreddit were **0.2357264** for the real data and **0.2471575** for the null model. Considering also the p-values on the right side of the plots, we can conclude that the results from the Louvain community detection are statistically significant, which means that is a good algorithm for this dataset. For Wallstreetbets it is statistically significant just for perturbation lower than 0.3, which is not so ideal. 
+
+When we compare with robin the best two algorithms from our modularity test (Louvain and Label Propagation) is possible to back up the findings that Louvain performs better for both subreddit datasets. For both subreddits the 
 
 ![](robinEvaluation/Stocks_louvain_vs_lp.jpeg )
 ![](robinEvaluation/WSB_louvain_vs_lp.jpeg )
@@ -421,7 +449,7 @@ visNetwork(nodes, edges)%>%
   visPhysics(maxVelocity = 1,repulsion = list(centralGravity=-0.5,springLength=500)) 
 ```
 
-To analyze the content of the comments for each cluster, we inspect some random clusters to find the most common words, which are displayed in the following wordclouds. For some clusters we can find that they use quite often the same words like "stocks" and "buy", but we also observed that the most frequent words in each cluster are different. In this example, for the selected clusters the most frequent words are "gme", "short", "fidelity" and "restricted".
+To analyze the content of the comments for each cluster, we inspect some random clusters to find the most common words, which are displayed in the following wordclouds. For some clusters we can find that they use quite often the same words like "stocks" and "buy", but we also observed that we have different topics on each cluster.
 
 ```{r wordcloud, warning=FALSE}
 par(mfrow=c(2,2),
@@ -432,8 +460,6 @@ get_word_cloud_community(raw_data,communities(lc),5)
 get_word_cloud_community(raw_data,communities(lc),8)
 get_word_cloud_community(raw_data,communities(lc),10)
 ```
-
-
 
 
 
@@ -509,7 +535,7 @@ ggplot(tickers_week_wsb, aes(x=CW, y=count)) +
 
 ggplot(tickers_week_stocks, aes(x=CW, y=count)) +
   geom_col(position = "dodge") +
-  theme(axis.text.x=element_text(angle = -45, hjust = 0)) +<- readRDS("../stocks.Rds")
+  theme(axis.text.x=element_text(angle = -45, hjust = 0)) +
   facet_grid(ticker~.)
 ```
 
@@ -562,7 +588,9 @@ ggplotly(ggplot(data=post_per_day_wallstreetbets, aes(x=date)) +
 
 ### User's interaction in subreddits
 
-```{r}
+We extracted the individual users that were active in each subreddit and try to found out if there are users that are active in both subreddits. In the following plot we present the distribution of active users in the subreddits, where we found out that more than half of the users are active in wallstreetbets (52.9%) and just 7% of the active users participate both in wallstreetbets and stocks.
+
+```{r user_interaction, echo = FALSE}
 active_users <- merge(getActiveUsers("stocks"),
                   getActiveUsers("wallstreetbets"),
                   by='_id', all = TRUE) %>%
@@ -579,20 +607,12 @@ summary_users <- active_users %>%
   group_by(type_participation) %>%
   summarise(prop=(n()/nrow(active_users))*100)
 
-ggplot(summary_users, aes(x=factor(1), y=prop, fill=type_participation))+
-  geom_bar(width = 1, stat = "identity") +
-  coord_polar(theta="y") + 
-  scale_fill_brewer(palette="Blues")+
-  theme_minimal()+
-  theme(panel.grid=element_blank(),
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.border = element_blank(),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        plot.title=element_text(size=14, face="bold")) +
-  geom_text(aes(y = prop/7 + c(0, cumsum(prop)[-length(prop)]), 
-                label = percent(prop/100)), size=5)
+ggplotly(ggplot(data=summary_users, aes(x=type_participation))+
+           geom_bar(aes(y=prop), 
+                    stat = "identity", position = "dodge")+
+           labs(title="User participation in Subreddits",
+                x = "Subreddit",
+                y = "Percetage"))
 ```
 
 
