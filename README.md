@@ -9,6 +9,6 @@ Several interesting questions regarding the influence of these subreddits on the
 
 URL Website: https://dianaguzman.shinyapps.io/redditFinanceAnalysis/
 
-URL Screencast: 
+URL Screencast: https://youtu.be/AtRUgU-btCs
 
 URL Process notebook: https://rpubs.com/dianacgr/redditFinanceAnalysis
