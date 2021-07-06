@@ -86,7 +86,7 @@ sample <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
 
 kbl(head(sample,3)) %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 ```
 Each comment contains the information of the content of the comment, user that make the comment, the related post including the content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
 
@@ -189,22 +189,22 @@ After adding the sentiment, we take a look at the the most positive and negative
 stocks %>% arrange(sentiment) %>% head() %>% select(comment, sentiment) %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 
 stocks %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment) %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 
 wsb %>% arrange(sentiment) %>% head() %>% select(comment, sentiment) %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 
 wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment) %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 ```
 
 Since we are only interested in if a stock is positive, negative or neutral, the values are recoded to 1, -1 and 0 respectively.
@@ -247,7 +247,7 @@ nyse_lst %>%
   head() %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 ```
 
 The names of the companies are also modified, words and Phrases like "Ltd.", "Company", "Group", "Share" have been removed manually to capture the informally used phrases one would use to refer to these companies.
@@ -259,7 +259,7 @@ nyse_lst_mod %>%
   head() %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 ```
 To add this information, a helper function was written which adds columns for sentiment and the mentioned tickers respectively.
 
@@ -552,7 +552,7 @@ wsb_prep %>%
   ccf_table() %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 ```
 
 
@@ -569,7 +569,7 @@ stocks_prep %>%
   ccf_table() %>%
   kbl() %>%
   kable_material(c("hover")) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = TRUE)
 ```
 For the stocks subreddit, we get the mean correlation for every lag is close to 0, so the sentiment could not be used to predict market movements in general.
 
