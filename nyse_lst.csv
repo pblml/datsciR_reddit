@@ -1,101 +1,101 @@
-"","symbol","name","joined"
-"1","BLIN","Bridgeline Digital Inc. Common Stock","[^A-Za-z0-9](BLIN)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Bridgeline Digital Inc. Common Stock)[^A-Za-z0-9]+"
-"2","SPCE","Virgin Galactic Holdings Inc. Common Stock","[^A-Za-z0-9](SPCE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Virgin Galactic Holdings Inc. Common Stock)[^A-Za-z0-9]+"
-"3","MRIN","Marin Software Incorporated Common Stock","[^A-Za-z0-9](MRIN)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Marin Software Incorporated Common Stock)[^A-Za-z0-9]+"
-"4","DIDI","DiDi Global Inc. American Depositary Shares (each four representing one Class A Ordinary Share)","[^A-Za-z0-9](DIDI)[^A-Za-z0-9]+|[^A-Za-z0-9]+(DiDi Global Inc. American Depositary Shares (each four representing one Class A Ordinary Share))[^A-Za-z0-9]+"
-"5","AMC","AMC Entertainment Holdings Inc. Class A Common Stock","[^A-Za-z0-9](AMC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(AMC Entertainment Holdings Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"6","SNDL","Sundial Growers Inc. Common Shares","[^A-Za-z0-9](SNDL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Sundial Growers Inc. Common Shares)[^A-Za-z0-9]+"
-"7","STAF","Staffing 360 Solutions Inc. Common Stock (DE)","[^A-Za-z0-9](STAF)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Staffing 360 Solutions Inc. Common Stock (DE))[^A-Za-z0-9]+"
-"8","ITRM","Iterum Therapeutics plc Ordinary Share","[^A-Za-z0-9](ITRM)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Iterum Therapeutics plc Ordinary Share)[^A-Za-z0-9]+"
-"9","AAPL","Apple Inc. Common Stock","[^A-Za-z0-9](AAPL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Apple Inc. Common Stock)[^A-Za-z0-9]+"
-"10","NIO","NIO Inc. American depositary shares each  representing one Class A ordinary share","[^A-Za-z0-9](NIO)[^A-Za-z0-9]+|[^A-Za-z0-9]+(NIO Inc. American depositary shares each  representing one Class A ordinary share)[^A-Za-z0-9]+"
-"11","WISH","ContextLogic Inc. Class A Common Stock","[^A-Za-z0-9](WISH)[^A-Za-z0-9]+|[^A-Za-z0-9]+(ContextLogic Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"12","AMD","Advanced Micro Devices Inc. Common Stock","[^A-Za-z0-9](AMD)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Advanced Micro Devices Inc. Common Stock)[^A-Za-z0-9]+"
-"13","XELA","Exela Technologies Inc. Common Stock","[^A-Za-z0-9](XELA)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Exela Technologies Inc. Common Stock)[^A-Za-z0-9]+"
-"14","OPTT","Ocean Power Technologies Inc. Common Stock","[^A-Za-z0-9](OPTT)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Ocean Power Technologies Inc. Common Stock)[^A-Za-z0-9]+"
-"15","F","Ford Motor Company Common Stock","[^A-Za-z0-9](F)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Ford Motor Company Common Stock)[^A-Za-z0-9]+"
-"16","CTXR","Citius Pharmaceuticals Inc. Common Stock","[^A-Za-z0-9](CTXR)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Citius Pharmaceuticals Inc. Common Stock)[^A-Za-z0-9]+"
-"17","NAKD","Naked Brand Group Limited Ordinary Shares","[^A-Za-z0-9](NAKD)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Naked Brand Group Limited Ordinary Shares)[^A-Za-z0-9]+"
-"18","VEON","VEON Ltd. ADS","[^A-Za-z0-9](VEON)[^A-Za-z0-9]+|[^A-Za-z0-9]+(VEON Ltd. ADS)[^A-Za-z0-9]+"
-"19","ALEC","Alector Inc. Common Stock","[^A-Za-z0-9](ALEC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Alector Inc. Common Stock)[^A-Za-z0-9]+"
-"20","TXMD","TherapeuticsMD Inc. Common Stock","[^A-Za-z0-9](TXMD)[^A-Za-z0-9]+|[^A-Za-z0-9]+(TherapeuticsMD Inc. Common Stock)[^A-Za-z0-9]+"
-"21","TATT","TAT Technologies Ltd. Ordinary Shares","[^A-Za-z0-9](TATT)[^A-Za-z0-9]+|[^A-Za-z0-9]+(TAT Technologies Ltd. Ordinary Shares)[^A-Za-z0-9]+"
-"22","RIG","Transocean Ltd (Switzerland) Common Stock","[^A-Za-z0-9](RIG)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Transocean Ltd (Switzerland) Common Stock)[^A-Za-z0-9]+"
-"23","BRQS","Borqs Technologies Inc. Ordinary Shares","[^A-Za-z0-9](BRQS)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Borqs Technologies Inc. Ordinary Shares)[^A-Za-z0-9]+"
-"24","ZOM","Zomedica Corp. Common Shares","[^A-Za-z0-9](ZOM)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Zomedica Corp. Common Shares)[^A-Za-z0-9]+"
-"25","GE","General Electric Company Common Stock","[^A-Za-z0-9](GE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(General Electric Company Common Stock)[^A-Za-z0-9]+"
-"26","CLOV","Clover Health Investments Corp. Class A Common Stock","[^A-Za-z0-9](CLOV)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Clover Health Investments Corp. Class A Common Stock)[^A-Za-z0-9]+"
-"27","ITUB","Itau Unibanco Banco Holding SA American Depositary Shares (Each repstg 500 Preferred shares)","[^A-Za-z0-9](ITUB)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Itau Unibanco Banco Holding SA American Depositary Shares (Each repstg 500 Preferred shares))[^A-Za-z0-9]+"
-"28","PLTR","Palantir Technologies Inc. Class A Common Stock","[^A-Za-z0-9](PLTR)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Palantir Technologies Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"29","BAC","Bank of America Corporation Common Stock","[^A-Za-z0-9](BAC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Bank of America Corporation Common Stock)[^A-Za-z0-9]+"
-"30","AHT","Ashford Hospitality Trust Inc Common Stock","[^A-Za-z0-9](AHT)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Ashford Hospitality Trust Inc Common Stock)[^A-Za-z0-9]+"
-"31","SQBG","Sequential Brands Group Inc. Common Stock","[^A-Za-z0-9](SQBG)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Sequential Brands Group Inc. Common Stock)[^A-Za-z0-9]+"
-"32","T","AT&T Inc.","[^A-Za-z0-9](T)[^A-Za-z0-9]+|[^A-Za-z0-9]+(AT&T Inc.)[^A-Za-z0-9]+"
-"33","ATOS","Atossa Therapeutics Inc. Common Stock","[^A-Za-z0-9](ATOS)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Atossa Therapeutics Inc. Common Stock)[^A-Za-z0-9]+"
-"34","TSLA","Tesla Inc. Common Stock","[^A-Za-z0-9](TSLA)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Tesla Inc. Common Stock)[^A-Za-z0-9]+"
-"35","MSFT","Microsoft Corporation Common Stock","[^A-Za-z0-9](MSFT)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Microsoft Corporation Common Stock)[^A-Za-z0-9]+"
-"36","SOFI","SoFi Technologies Inc. Common Stock  ","[^A-Za-z0-9](SOFI)[^A-Za-z0-9]+|[^A-Za-z0-9]+(SoFi Technologies Inc. Common Stock  )[^A-Za-z0-9]+"
-"37","LI","Li Auto Inc. American Depositary Shares","[^A-Za-z0-9](LI)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Li Auto Inc. American Depositary Shares)[^A-Za-z0-9]+"
-"38","CEI","Camber Energy Inc. Common Stock","[^A-Za-z0-9](CEI)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Camber Energy Inc. Common Stock)[^A-Za-z0-9]+"
-"39","JOB","GEE Group Inc. Common Stock","[^A-Za-z0-9](JOB)[^A-Za-z0-9]+|[^A-Za-z0-9]+(GEE Group Inc. Common Stock)[^A-Za-z0-9]+"
-"40","BBD","Banco Bradesco Sa American Depositary Shares","[^A-Za-z0-9](BBD)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Banco Bradesco Sa American Depositary Shares)[^A-Za-z0-9]+"
-"41","MU","Micron Technology Inc. Common Stock","[^A-Za-z0-9](MU)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Micron Technology Inc. Common Stock)[^A-Za-z0-9]+"
-"42","EDU","New Oriental Education & Technology Group Inc. Sponsored ADR representing 1 Ordinary Share (Cayman Islands)","[^A-Za-z0-9](EDU)[^A-Za-z0-9]+|[^A-Za-z0-9]+(New Oriental Education & Technology Group Inc. Sponsored ADR representing 1 Ordinary Share (Cayman Islands))[^A-Za-z0-9]+"
-"43","ATHE","Alterity Therapeutics Limited American Depositary Shares","[^A-Za-z0-9](ATHE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Alterity Therapeutics Limited American Depositary Shares)[^A-Za-z0-9]+"
-"44","AAL","American Airlines Group Inc. Common Stock","[^A-Za-z0-9](AAL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(American Airlines Group Inc. Common Stock)[^A-Za-z0-9]+"
-"45","CCL","Carnival Corporation Common Stock","[^A-Za-z0-9](CCL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Carnival Corporation Common Stock)[^A-Za-z0-9]+"
-"46","VALE","VALE S.A.  American Depositary Shares Each Representing one common share","[^A-Za-z0-9](VALE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(VALE S.A.  American Depositary Shares Each Representing one common share)[^A-Za-z0-9]+"
-"47","BSQR","BSQUARE Corporation Common Stock","[^A-Za-z0-9](BSQR)[^A-Za-z0-9]+|[^A-Za-z0-9]+(BSQUARE Corporation Common Stock)[^A-Za-z0-9]+"
-"48","WKHS","Workhorse Group Inc. Common Stock","[^A-Za-z0-9](WKHS)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Workhorse Group Inc. Common Stock)[^A-Za-z0-9]+"
-"49","PBR","Petroleo Brasileiro S.A.- Petrobras Common Stock","[^A-Za-z0-9](PBR)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Petroleo Brasileiro S.A.- Petrobras Common Stock)[^A-Za-z0-9]+"
-"50","TAL","TAL Education Group American Depositary Shares","[^A-Za-z0-9](TAL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(TAL Education Group American Depositary Shares)[^A-Za-z0-9]+"
-"51","OSG","Overseas Shipholding Group Inc. Class A Common Stock","[^A-Za-z0-9](OSG)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Overseas Shipholding Group Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"52","ZNGA","Zynga Inc. Class A Common Stock","[^A-Za-z0-9](ZNGA)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Zynga Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"53","CLF","Cleveland-Cliffs Inc. Common Stock","[^A-Za-z0-9](CLF)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Cleveland-Cliffs Inc. Common Stock)[^A-Za-z0-9]+"
-"54","ASTR","Astra Space Inc. Class A Common Stock ","[^A-Za-z0-9](ASTR)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Astra Space Inc. Class A Common Stock )[^A-Za-z0-9]+"
-"55","XPEV","XPeng Inc. American depositary shares each representing two Class A ordinary shares","[^A-Za-z0-9](XPEV)[^A-Za-z0-9]+|[^A-Za-z0-9]+(XPeng Inc. American depositary shares each representing two Class A ordinary shares)[^A-Za-z0-9]+"
-"56","SENS","Senseonics Holdings Inc. Common Stock","[^A-Za-z0-9](SENS)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Senseonics Holdings Inc. Common Stock)[^A-Za-z0-9]+"
-"57","INTC","Intel Corporation Common Stock","[^A-Za-z0-9](INTC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Intel Corporation Common Stock)[^A-Za-z0-9]+"
-"58","IBM","International Business Machines Corporation Common Stock","[^A-Za-z0-9](IBM)[^A-Za-z0-9]+|[^A-Za-z0-9]+(International Business Machines Corporation Common Stock)[^A-Za-z0-9]+"
-"59","PFE","Pfizer Inc. Common Stock","[^A-Za-z0-9](PFE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Pfizer Inc. Common Stock)[^A-Za-z0-9]+"
-"60","NOK","Nokia Corporation Sponsored American Depositary Shares","[^A-Za-z0-9](NOK)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Nokia Corporation Sponsored American Depositary Shares)[^A-Za-z0-9]+"
-"61","WAVE","Eco Wave Power Global AB (publ) American Depositary Shares","[^A-Za-z0-9](WAVE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Eco Wave Power Global AB (publ) American Depositary Shares)[^A-Za-z0-9]+"
-"62","WBA","Walgreens Boots Alliance Inc. Common Stock","[^A-Za-z0-9](WBA)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Walgreens Boots Alliance Inc. Common Stock)[^A-Za-z0-9]+"
-"63","OCGN","Ocugen Inc. Common Stock","[^A-Za-z0-9](OCGN)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Ocugen Inc. Common Stock)[^A-Za-z0-9]+"
-"64","BA","Boeing Company (The) Common Stock","[^A-Za-z0-9](BA)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Boeing Company (The) Common Stock)[^A-Za-z0-9]+"
-"65","ORCL","Oracle Corporation Common Stock","[^A-Za-z0-9](ORCL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Oracle Corporation Common Stock)[^A-Za-z0-9]+"
-"66","ABEV","Ambev S.A. American Depositary Shares (Each representing 1 Common Share)","[^A-Za-z0-9](ABEV)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Ambev S.A. American Depositary Shares (Each representing 1 Common Share))[^A-Za-z0-9]+"
-"67","RIDE","Lordstown Motors Corp. Class A Common Stock","[^A-Za-z0-9](RIDE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Lordstown Motors Corp. Class A Common Stock)[^A-Za-z0-9]+"
-"68","X","United States Steel Corporation Common Stock","[^A-Za-z0-9](X)[^A-Za-z0-9]+|[^A-Za-z0-9]+(United States Steel Corporation Common Stock)[^A-Za-z0-9]+"
-"69","CSCO","Cisco Systems Inc. Common Stock (DE)","[^A-Za-z0-9](CSCO)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Cisco Systems Inc. Common Stock (DE))[^A-Za-z0-9]+"
-"70","IVR","INVESCO MORTGAGE CAPITAL INC Common Stock","[^A-Za-z0-9](IVR)[^A-Za-z0-9]+|[^A-Za-z0-9]+(INVESCO MORTGAGE CAPITAL INC Common Stock)[^A-Za-z0-9]+"
-"71","FCEL","FuelCell Energy Inc. Common Stock","[^A-Za-z0-9](FCEL)[^A-Za-z0-9]+|[^A-Za-z0-9]+(FuelCell Energy Inc. Common Stock)[^A-Za-z0-9]+"
-"72","NLY","Annaly Capital Management Inc Common Stock","[^A-Za-z0-9](NLY)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Annaly Capital Management Inc Common Stock)[^A-Za-z0-9]+"
-"73","XOM","Exxon Mobil Corporation Common Stock","[^A-Za-z0-9](XOM)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Exxon Mobil Corporation Common Stock)[^A-Za-z0-9]+"
-"74","IDEX","Ideanomics Inc. Common Stock","[^A-Za-z0-9](IDEX)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Ideanomics Inc. Common Stock)[^A-Za-z0-9]+"
-"75","MRO","Marathon Oil Corporation Common Stock","[^A-Za-z0-9](MRO)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Marathon Oil Corporation Common Stock)[^A-Za-z0-9]+"
-"76","UBER","Uber Technologies Inc. Common Stock","[^A-Za-z0-9](UBER)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Uber Technologies Inc. Common Stock)[^A-Za-z0-9]+"
-"77","C","Citigroup Inc. Common Stock","[^A-Za-z0-9](C)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Citigroup Inc. Common Stock)[^A-Za-z0-9]+"
-"78","PLUG","Plug Power Inc. Common Stock","[^A-Za-z0-9](PLUG)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Plug Power Inc. Common Stock)[^A-Za-z0-9]+"
-"79","WFC","Wells Fargo & Company Common Stock","[^A-Za-z0-9](WFC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Wells Fargo & Company Common Stock)[^A-Za-z0-9]+"
-"80","TLRY","Tilray Inc. Class 2 Common Stock ","[^A-Za-z0-9](TLRY)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Tilray Inc. Class 2 Common Stock )[^A-Za-z0-9]+"
-"81","SIRI","Sirius XM Holdings Inc. Common Stock","[^A-Za-z0-9](SIRI)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Sirius XM Holdings Inc. Common Stock)[^A-Za-z0-9]+"
-"82","BABA","Alibaba Group Holding Limited American Depositary Shares each representing eight Ordinary share","[^A-Za-z0-9](BABA)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Alibaba Group Holding Limited American Depositary Shares each representing eight Ordinary share)[^A-Za-z0-9]+"
-"83","SRNE","Sorrento Therapeutics Inc.  Common Stock","[^A-Za-z0-9](SRNE)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Sorrento Therapeutics Inc.  Common Stock)[^A-Za-z0-9]+"
-"84","JPM","JP Morgan Chase & Co. Common Stock","[^A-Za-z0-9](JPM)[^A-Za-z0-9]+|[^A-Za-z0-9]+(JP Morgan Chase & Co. Common Stock)[^A-Za-z0-9]+"
-"85","VZ","Verizon Communications Inc. Common Stock","[^A-Za-z0-9](VZ)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Verizon Communications Inc. Common Stock)[^A-Za-z0-9]+"
-"86","FB","Facebook Inc. Class A Common Stock","[^A-Za-z0-9](FB)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Facebook Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"87","AUY","Yamana Gold Inc. Ordinary Shares (Canada)","[^A-Za-z0-9](AUY)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Yamana Gold Inc. Ordinary Shares (Canada))[^A-Za-z0-9]+"
-"88","CSX","CSX Corporation Common Stock","[^A-Za-z0-9](CSX)[^A-Za-z0-9]+|[^A-Za-z0-9]+(CSX Corporation Common Stock)[^A-Za-z0-9]+"
-"89","APPS","Digital Turbine Inc. Common Stock","[^A-Za-z0-9](APPS)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Digital Turbine Inc. Common Stock)[^A-Za-z0-9]+"
-"90","DIS","Walt Disney Company (The) Common Stock","[^A-Za-z0-9](DIS)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Walt Disney Company (The) Common Stock)[^A-Za-z0-9]+"
-"91","KGC","Kinross Gold Corporation Common Stock","[^A-Za-z0-9](KGC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Kinross Gold Corporation Common Stock)[^A-Za-z0-9]+"
-"92","SNAP","Snap Inc. Class A Common Stock","[^A-Za-z0-9](SNAP)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Snap Inc. Class A Common Stock)[^A-Za-z0-9]+"
-"93","GOLD","Barrick Gold Corporation Common Stock (BC)","[^A-Za-z0-9](GOLD)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Barrick Gold Corporation Common Stock (BC))[^A-Za-z0-9]+"
-"94","ENG","ENGlobal Corporation Common Stock","[^A-Za-z0-9](ENG)[^A-Za-z0-9]+|[^A-Za-z0-9]+(ENGlobal Corporation Common Stock)[^A-Za-z0-9]+"
-"95","OXY","Occidental Petroleum Corporation Common Stock","[^A-Za-z0-9](OXY)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Occidental Petroleum Corporation Common Stock)[^A-Za-z0-9]+"
-"96","BNGO","Bionano Genomics Inc. Common Stock","[^A-Za-z0-9](BNGO)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Bionano Genomics Inc. Common Stock)[^A-Za-z0-9]+"
-"97","KO","Coca-Cola Company (The) Common Stock","[^A-Za-z0-9](KO)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Coca-Cola Company (The) Common Stock)[^A-Za-z0-9]+"
-"98","FCX","Freeport-McMoRan Inc. Common Stock","[^A-Za-z0-9](FCX)[^A-Za-z0-9]+|[^A-Za-z0-9]+(Freeport-McMoRan Inc. Common Stock)[^A-Za-z0-9]+"
-"99","BB","BlackBerry Limited Common Stock","[^A-Za-z0-9](BB)[^A-Za-z0-9]+|[^A-Za-z0-9]+(BlackBerry Limited Common Stock)[^A-Za-z0-9]+"
-"100","VIAC","ViacomCBS Inc. Class B Common Stock","[^A-Za-z0-9](VIAC)[^A-Za-z0-9]+|[^A-Za-z0-9]+(ViacomCBS Inc. Class B Common Stock)[^A-Za-z0-9]+"
+,symbol,name
+1,BLIN,Bridgeline Digital Inc. Common Stock
+2,SPCE,Virgin Galactic Holdings Inc. Common Stock
+3,MRIN,Marin Software Incorporated Common Stock
+4,DIDI,DiDi Global Inc. American Depositary Shares (each four representing one Class A Ordinary Share)
+5,AMC,AMC Entertainment Holdings Inc. Class A Common Stock
+6,SNDL,Sundial Growers Inc. Common Shares
+7,STAF,Staffing 360 Solutions Inc. Common Stock (DE)
+8,ITRM,Iterum Therapeutics plc Ordinary Share
+9,AAPL,Apple Inc. Common Stock
+10,NIO,NIO Inc. American depositary shares each  representing one Class A ordinary share
+11,WISH,ContextLogic Inc. Class A Common Stock
+12,AMD,Advanced Micro Devices Inc. Common Stock
+13,XELA,Exela Technologies Inc. Common Stock
+14,OPTT,Ocean Power Technologies Inc. Common Stock
+15,F,Ford Motor Company Common Stock
+16,CTXR,Citius Pharmaceuticals Inc. Common Stock
+17,NAKD,Naked Brand Group Limited Ordinary Shares
+18,VEON,VEON Ltd. ADS
+19,ALEC,Alector Inc. Common Stock
+20,TXMD,TherapeuticsMD Inc. Common Stock
+21,TATT,TAT Technologies Ltd. Ordinary Shares
+22,RIG,Transocean Ltd (Switzerland) Common Stock
+23,BRQS,Borqs Technologies Inc. Ordinary Shares
+24,ZOM,Zomedica Corp. Common Shares
+25,GE,General Electric Company Common Stock
+26,CLOV,Clover Health Investments Corp. Class A Common Stock
+27,ITUB,Itau Unibanco Banco Holding SA American Depositary Shares (Each repstg 500 Preferred shares)
+28,PLTR,Palantir Technologies Inc. Class A Common Stock
+29,BAC,Bank of America Corporation Common Stock
+30,AHT,Ashford Hospitality Trust Inc Common Stock
+31,SQBG,Sequential Brands Group Inc. Common Stock
+32,T,AT&T Inc.
+33,ATOS,Atossa Therapeutics Inc. Common Stock
+34,TSLA,Tesla Inc. Common Stock
+35,MSFT,Microsoft Corporation Common Stock
+36,SOFI,SoFi Technologies Inc. Common Stock  
+37,LI,Li Auto Inc. American Depositary Shares
+38,CEI,Camber Energy Inc. Common Stock
+39,JOB,GEE Group Inc. Common Stock
+40,BBD,Banco Bradesco Sa American Depositary Shares
+41,MU,Micron Technology Inc. Common Stock
+42,EDU,New Oriental Education & Technology Group Inc. Sponsored ADR representing 1 Ordinary Share (Cayman Islands)
+43,ATHE,Alterity Therapeutics Limited American Depositary Shares
+44,AAL,American Airlines Group Inc. Common Stock
+45,CCL,Carnival Corporation Common Stock
+46,VALE,VALE S.A.  American Depositary Shares Each Representing one common share
+47,BSQR,BSQUARE Corporation Common Stock
+48,WKHS,Workhorse Group Inc. Common Stock
+49,PBR,Petroleo Brasileiro S.A.- Petrobras Common Stock
+50,TAL,TAL Education Group American Depositary Shares
+51,OSG,Overseas Shipholding Group Inc. Class A Common Stock
+52,ZNGA,Zynga Inc. Class A Common Stock
+53,CLF,Cleveland-Cliffs Inc. Common Stock
+54,ASTR,Astra Space Inc. Class A Common Stock 
+55,XPEV,XPeng Inc. American depositary shares each representing two Class A ordinary shares
+56,SENS,Senseonics Holdings Inc. Common Stock
+57,INTC,Intel Corporation Common Stock
+58,IBM,International Business Machines Corporation Common Stock
+59,PFE,Pfizer Inc. Common Stock
+60,NOK,Nokia Corporation Sponsored American Depositary Shares
+61,WAVE,Eco Wave Power Global AB (publ) American Depositary Shares
+62,WBA,Walgreens Boots Alliance Inc. Common Stock
+63,OCGN,Ocugen Inc. Common Stock
+64,BA,Boeing Company (The) Common Stock
+65,ORCL,Oracle Corporation Common Stock
+66,ABEV,Ambev S.A. American Depositary Shares (Each representing 1 Common Share)
+67,RIDE,Lordstown Motors Corp. Class A Common Stock
+68,X,United States Steel Corporation Common Stock
+69,CSCO,Cisco Systems Inc. Common Stock (DE)
+70,IVR,INVESCO MORTGAGE CAPITAL INC Common Stock
+71,FCEL,FuelCell Energy Inc. Common Stock
+72,NLY,Annaly Capital Management Inc Common Stock
+73,XOM,Exxon Mobil Corporation Common Stock
+74,IDEX,Ideanomics Inc. Common Stock
+75,MRO,Marathon Oil Corporation Common Stock
+76,UBER,Uber Technologies Inc. Common Stock
+77,C,Citigroup Inc. Common Stock
+78,PLUG,Plug Power Inc. Common Stock
+79,WFC,Wells Fargo & Company Common Stock
+80,TLRY,Tilray Inc. Class 2 Common Stock 
+81,SIRI,Sirius XM Holdings Inc. Common Stock
+82,BABA,Alibaba Group Holding Limited American Depositary Shares each representing eight Ordinary share
+83,SRNE,Sorrento Therapeutics Inc.  Common Stock
+84,JPM,JP Morgan Chase & Co. Common Stock
+85,VZ,Verizon Communications Inc. Common Stock
+86,FB,Facebook Inc. Class A Common Stock
+87,AUY,Yamana Gold Inc. Ordinary Shares (Canada)
+88,CSX,CSX Corporation Common Stock
+89,APPS,Digital Turbine Inc. Common Stock
+90,DIS,Walt Disney Company (The) Common Stock
+91,KGC,Kinross Gold Corporation Common Stock
+92,SNAP,Snap Inc. Class A Common Stock
+93,GOLD,Barrick Gold Corporation Common Stock (BC)
+94,ENG,ENGlobal Corporation Common Stock
+95,OXY,Occidental Petroleum Corporation Common Stock
+96,BNGO,Bionano Genomics Inc. Common Stock
+97,KO,Coca-Cola Company (The) Common Stock
+98,FCX,Freeport-McMoRan Inc. Common Stock
+99,BB,BlackBerry Limited Common Stock
+100,VIAC,ViacomCBS Inc. Class B Common Stock

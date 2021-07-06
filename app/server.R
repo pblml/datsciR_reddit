@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(shinyjs)
 source("../cluster_evaluation.R", chdir = T)
 source("../DB_connection.R", chdir = T)
 source("../analysis_helpers.R", chdir = T)
