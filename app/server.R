@@ -58,11 +58,7 @@ shinyServer(function(session, input, output) {
   
   output$tableReddit <- DT::renderDataTable(
     head(dat %>%
-      subset(select = -c(ticker,sentiment)),3),
-    options = list(
-      dom = 't',
-      ordering = FALSE,
-      rowCallback = JS("function(r,d) {$(r).attr('height', '100px')}"))
+      subset(select = -c(ticker,sentiment)),3)
       
   )
   

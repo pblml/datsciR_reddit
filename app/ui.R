@@ -53,7 +53,19 @@ data in a clean format."),
                      tags$img( id = "executionTime", src="execution_time_clusters.png"),
                      tags$p("According to our results, the best algorithm for the datasets is Louvain. An interactive example of the creation of the communities with this algorithm can be found in the Interactive Community Analysis Tab")
                      ),
-            tabPanel(title = "Stock Analysis",""),
+            tabPanel(title = "Stock Analysis",
+                     tags$p("To answer the the question, if the sentiment towards a specific ticker has an influence on market data, cross-correlation between the sentiment and the percentage change of the price is used."),
+                     tags$p("During the cross-correlation time series are lagged against each other, so that the  ",tags$b("t - lag"), "values of one time series are correlated against the values of the other time series at time ",tags$b("t"),"."),
+                     tags$p("Since the mentioned tickers are quite sparse, only the top 10 mentioned tickers are used and missing sentiment values are handled by `na.pass`, so they are not considered in the calculation, but simply passed through. Imputation of the missing values is also not feasable, since sentiment values are often not available for longer time spans."),
+                     tags$p("The results are visualized using the ACF plots which are returned by the ",tags$b("ccf")," function. It shows the correlation of the two time series depending on the lag, including 95% confidence intervals."),
+                     tags$p("Since applying a cross correlation function assumes that the both time series are stationary, this is ensured de-trending the timeseries before the calculation using ",tags$b("ndiffs")," and ",tags$b("diff"),"."),
+                     tags$p("The ACF Plots and summary tables for the top 10 tickers mentioned by the subreddits are shown below."),
+                     tags$img(id = "acf_top10", src="acf_top10tickers.png"),
+                     tags$p("The mean correlation at lag - 2 is 0.22, so the mean sentiment of wallstreetbets on a day could be used to predict market movement two days later."),
+                     tags$img(id = "acf_top10_stocks", src="acf_top10tickers_stocks.png"),
+                     tags$p("For the stocks subreddit, we get the mean correlation for every lag is close to 0, so the sentiment could not be used to predict market movements in general."),
+                     tags$p("These different outcomes probably result from the sparsity of the ticker mentions, so these conclusions should be taking with a grain of salt. Because of this, an analysis of a specific community is not feasable, the data is just too sparse. To remedy this, the extraction of the data has to be done different. Only posts which mention a specific ticker in a given time frame should be extracted to combat this problem of sparse data.")),
+                    
             tabPanel(title = "Interactive Community Analysis",
                      sidebarLayout(
                          sidebarPanel(
