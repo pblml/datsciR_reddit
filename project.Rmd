@@ -572,11 +572,11 @@ stocks_prep <- prepare_analysis(stocks)
 wsb_prep <- prepare_analysis(wsb)
 ```
 
-```{r, echo=F}
+```{r, message=FALSE, echo=F}
 wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.)/2, margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/wallstreetbets")
 ```
 
-```{r, echo=F}
+```{r, echo=F, message=FALSE}
 wsb_prep %>%
   ccf_by_price_vol() %>%
   ccf_table() %>%
@@ -586,11 +586,11 @@ wsb_prep %>%
 ```
 The mean correlation at lag - 2 is 0.22, so the mean sentiment of wallstreetbets on a day could be used to predict market movement two days later.
 
-```{r, echo=F}
+```{r, echo=F, message=FALSE}
 stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.)/2, margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/stocks")
 ```
 
-```{r, echo=F}
+```{r, echo=F, message=FALSE}
 stocks_prep %>%
   ccf_by_price_vol() %>%
   ccf_table() %>%
