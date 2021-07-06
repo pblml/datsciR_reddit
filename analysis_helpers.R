@@ -15,7 +15,7 @@ prepare_analysis <- function(df, topn=10, blacklist=NULL){
     table() %>%
     as.data.frame() %>%
     arrange(desc(Freq)) %>% 
-    head(10) %>%
+    head(topn) %>%
     pull(1)
   
   l.out <- BatchGetSymbols(tickers = mentioned_tickers, 
@@ -48,29 +48,26 @@ prepare_analysis <- function(df, topn=10, blacklist=NULL){
 
 ccf_by_price_vol <- function(df_lst, na.action = na.pass){
   res_lst <- list()
+
   for (ticker in names(df_lst)){
+    print(ticker)
     df_stock <- df_lst[[ticker]]
-      
-    sentiment_ts <- df_stock$sentiment
-    price_ts <- df_stock$ret.adjusted.prices
-    volume_ts <- df_stock$volume
-    print(tseries::kpss.test(sentiment_ts %>% na.omit())$p.value)
-    if (tseries::kpss.test(sentiment_ts %>% na.omit())$p.value > 0.05){
-      print(paste0("Time Series 'sentiment' of ", ticker, " is not stationary!"))
-    }else if (tseries::kpss.test(price_ts %>% na.omit())$p.value > 0.05){
-      print(paste0("Time Series 'sentiment' of ", ticker, " is not stationary!"))
-    }else if (tseries::kpss.test(volume_ts %>% na.omit())$p.value > 0.05){
-      print(paste0("Time Series 'sentiment' of ", ticker, " is not stationary!"))
-    }
     
+    sentiment_ts <- df_stock %>%
+      select(ref.date, sentiment) %>%
+      zoo::read.zoo() %>% 
+      as.ts(frequency = 1) %>% 
+      {if (ndiffs(.) > 0) diff(., ndiffs(.)) else .}
+    price_ts <- df_stock %>% select(ref.date, ret.closing.prices) %>% zoo::read.zoo() %>% as.ts(frequency = 1) %>% {if (ndiffs(.) > 0) diff(., ndiffs(.)) else .}
+    volume_ts <- df_stock %>% select(ref.date, volume) %>% zoo::read.zoo() %>% as.ts(frequency = 1) %>% {if (ndiffs(.) > 0) diff(., ndiffs(.)) else .}
     
     res_lst[[ticker]][["price"]] <- ccf(sentiment_ts, price_ts, lag.max = 5, plot=F, na.action = na.action)
     res_lst[[ticker]][["volume"]] <- ccf(sentiment_ts, volume_ts, lag.max = 5, plot=F, na.action = na.action)
   }
   return(res_lst)
-}  
+} 
 
-plot_ccf <- function(ccf_lst){
+ccf_plots <- function(ccf_lst){
   plot_lst <- list()
   for (ticker in names(ccf_lst)){
     plot_lst[[paste0(ticker, "_price")]] <- (ccf_lst[[ticker]][["price"]] %>% 
@@ -130,5 +127,5 @@ plot_ts <- function(dat, symbol) {
 
 
   
-  return(subplot(fig1, fig2, fig3, nrows=3, shareX = T))
+  return(subplot(fig1, fig2, fig3, nrows=3, shareX = T, margin = 0.02))
 }
