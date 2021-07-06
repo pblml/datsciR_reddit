@@ -11,4 +11,4 @@ URL Website: https://dianaguzman.shinyapps.io/redditFinanceAnalysis/
 
 URL Screencast: 
 
-URL Process notebook:
+URL Process notebook: https://rpubs.com/dianacgr/redditFinanceAnalysis
