@@ -19,7 +19,7 @@ shinyUI(
         tabsetPanel(
             tabPanel(title = "Home",
                     tags$h2("Overview"),
-                    tags$p("In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place[@RePEc]. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it."),
+                    tags$p("In January of 2021, a major short squeeze of the stock of video game retailer GameStop and other securities took place. A major driving force behind this event was the subreddit wallstreetbets, where users discussed the market situation around GameStop, focussing on the amount of short positions major hedge funds held for this stock and a “David versus Goliath”-situation unfolded. What followed was a large influx of users to the subreddit, who were convinced the stock had to go up and hedge funds had to pay for it."),
                     tags$p("Several interesting questions regarding the influence of these subreddits on the stock market emerge from this event. In this project, we want to detect communities in finance related subreddits and mine their sentiment towards discussed stocks to measure if they either have significant influence on or can predict market movements."),
                     tags$h2("Research questions"),
                     tags$h4("1. How can we identify subcommunities inside subreddit and which measures can be used to evaluate the subcommunities?"),
@@ -30,13 +30,16 @@ shinyUI(
                     tags$p("Considering the Gamestop event we would like to find out if there are relations between the sentiment that the users express in the subreddit towards a stock with the real stock prices.")
                     ),
             tabPanel(title = "Data",
-                     tags$h2("Reddit"),
-                     tags$p("The data that we use from the subreddits are comments on posts and the post content."),
-                     dataTableOutput("tableReddit"),
-                     tags$h2("Yahoo Finance"),
-                     tags$p("To get the market data for the relevant tickers, the package 'quantmod' is used. It takes a list of ticker symbols, a start and an end date and returns the market
+                     navlistPanel(
+                         tabPanel(title = "Reddit",
+                                  tags$p("The data that we use from the subreddits are comments on posts and the post content. The structure of the raw data is shown in the following table: "),
+                                  dataTableOutput("tableReddit")),
+                         tabPanel(title="Yahoo Finance",
+                                  tags$p("To get the market data for the relevant tickers, the package 'quantmod' is used. It takes a list of ticker symbols, a start and an end date and returns the market
 data in a clean format."),
-                     dataTableOutput("tableStockData")),
+                                  dataTableOutput("tableStockData"))
+                     )
+                     ),
             tabPanel(title = "Community Detection",
                      tags$h2("Graph structure from data"),
                      tags$p("For the community detection we used the library igraph. For this purpose the subreddit's data was transformed into a graph representation. Nodes represent the users of the subreddit, while interaction between the users is represented by edges. The interactions are classified into:"),
@@ -73,18 +76,20 @@ data in a clean format."),
                          )
                      )),
             tabPanel(title = "Resources",
-                     mainPanel(
-                         tags$p("The additional resources from this project can be found under the following links: "),
-                         tags$a( href = "", "Rmarkdown Notebook",target="_blank",
-                                 tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
-                         ),
-                         tags$a( href = "https://github.com/pblml/datsciR_reddit", "Repository", text_align="right",target="_blank",
-                                 tags$img( id = "github-logo", src="logo_github.jpg",height = 200, width = 200)
-                         ),
-                         tags$a( href = "https://github.com/pblml/datsciR_reddit", "Screencast video",target="_blank",
-                                 tags$img( id = "github-logo", src="logo_github.jpg",height = 200, width = 200)
-                         ),
-                     ))
+                     navlistPanel(
+                         tabPanel(title = "Rmarkdown Notebook",
+                                  tags$a( href = "", target="_blank",
+                                          tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
+                                  )),
+                         tabPanel(title = "Github",
+                                  tags$a( href = "", target="_blank",
+                                          tags$img( id = "github-logo", src="logo_github.jpg",height = 200, width = 200)
+                                  )),
+                         tabPanel(title = "Screencast video",
+                                  tags$a( href = "", target="_blank",
+                                          tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
+                                  )),
+                         ))
         ),
 
     )

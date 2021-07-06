@@ -280,11 +280,16 @@ For the community detection we used the library igraph. For this purpose the sub
 **2. Answer to a comment:** comments made as answer to other comments. For this case an edge is created between two users and it requires to use the hierarchy of comments to find the proper connection.
 
 The weight of the edges is given by the number of interactions between the two users. A visual representation of the graph created by the comments between the dates 2021-01-23 and 2021-01-26 for the subreddit is presented in the following plot.  
-
+```{r include=FALSE}
+source("cluster_evaluation.R")
+```
 ```{r graphcreation, echo=FALSE, warning = FALSE}
+posts_stocks <- stocks %>%
+  filter(user!="[deleted]",comm_date>=lubridate::ymd(initial_time),
+         comm_date<=lubridate::ymd(end_time))
 
 #create igraph object
-g <- create_subreddit_graph_from_df(raw_data)
+g <- create_subreddit_graph_from_df(posts_stocks)
 
 plot(g,vertex.label=NA, vertex.color="blue", vertex.size=5)
 ```
@@ -302,9 +307,7 @@ Since there is no external information about the communities detected, modularit
 
 In order to compare the cluster algorithms, we evaluate all of algorithms over 4 different samples of the data as shown in the following table. We used both subreddits wallstreetbets and stocks with different sample sizes. With this test we recorded the modularity and execution time. The results from the evaluation are given in the following plots. 
 
-```{r include=FALSE}
-source("cluster_evaluation.R")
-```
+
 
 
 ```{r cluster_evaluation, echo=FALSE, warning=FALSE}
@@ -392,7 +395,7 @@ Considering these tests, we selected Louvain as the clustering algorithm for the
 #create communities
 lc <- cluster_louvain(g)
 
-visualization <- create_communities_visualization_from_df(raw_data)
+visualization <- create_communities_visualization_from_df(posts_stocks)
 visualization
 ```
 
@@ -402,10 +405,10 @@ To analyze the content of the comments for each cluster, we inspect some random 
 par(mfrow=c(2,2),
     oma = c(0,0,0,0),
     mar = c(0,0,0,0))
-get_word_cloud_community(raw_data,communities(lc),2)
-get_word_cloud_community(raw_data,communities(lc),5)
-get_word_cloud_community(raw_data,communities(lc),8)
-get_word_cloud_community(raw_data,communities(lc),10)
+get_word_cloud_community(posts_stocks,communities(lc),2)
+get_word_cloud_community(posts_stocks,communities(lc),5)
+get_word_cloud_community(posts_stocks,communities(lc),8)
+get_word_cloud_community(posts_stocks,communities(lc),10)
 ```
 
 # Exploratory Data Analysis
@@ -510,27 +513,7 @@ ggplotly(ggplot(data=comments_per_day_wallstreetbets, aes(x=date)) +
                 y = "Comments"))
 ```
 
-In terms of number of different posts, we got as expected 5 posts per day except for the the date 07.02.2021 in the stocks subreddit where we got just 1 post.
 
-```{r post_subreddits, echo=FALSE }
-post_per_day_stocks <- getPostPerDay(databaseName,"stocks") %>%
-  mutate(subreddit = "Stocks")
-post_per_day_wallstreetbets <- getPostPerDay(databaseName,"wallstreetbets")%>%
-  mutate(subreddit = "Wallstreetbets") %>%
-  rbind(.,post_per_day_stocks) %>%
-  rename(date=X_id.data) 
-  
-
-post_per_day_wallstreetbets$date <- ymd(post_per_day_wallstreetbets$date)
-
-ggplotly(ggplot(data=post_per_day_wallstreetbets, aes(x=date)) +
-           geom_line(aes(y=nr_post, color=subreddit))+
-           scale_x_date(date_labels = "%m-%Y")+
-           labs(title="Posts per day",
-                x = "Date",
-                y = "Comments"))
-
-```
 
 ### User's interaction in subreddits
 
@@ -587,7 +570,6 @@ The results for correlating the sentiment and volume against the adjusted price 
 source("analysis_helpers.R")
 stocks_prep <- prepare_analysis(stocks) 
 wsb_prep <- prepare_analysis(wsb)
-combined_prep <- prepare_analysis(rbind(stocks, wsb))
 ```
 ```{r}
 stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.02)
