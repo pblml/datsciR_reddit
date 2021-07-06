@@ -62,12 +62,19 @@ clustering_evaluation <-
            databaseName,
            collectionName,
            initial_time,
-           end_time) {
-    g <-
-      create_subreddit_graph(databaseName, collectionName, initial_time, end_time)
+           end_time, initial_df = NULL) {
+    if (is.null(initial_df)) {
+      g <-
+        create_subreddit_graph(databaseName, collectionName, initial_time, end_time)
+      datasetSize <- nrow(loadDataDates(databaseName, collectionName, initial_time, end_time) %>%
+                            filter(user != "[deleted]"))
+    }else{
+      g <-
+        create_subreddit_graph_from_df(initial_df)
+      datasetSize <- nrow(initial_df %>%
+                            filter(user != "[deleted]"))
+    }
     
-    datasetSize <- nrow(loadDataDates(databaseName, collectionName, initial_time, end_time) %>%
-      filter(user != "[deleted]"))
     #execute clustering algorithms
     #louvain
     start_time <- Sys.time()
