@@ -54,6 +54,15 @@ ccf_by_price_vol <- function(df_lst, na.action = na.pass){
     sentiment_ts <- df_stock$sentiment
     price_ts <- df_stock$ret.adjusted.prices
     volume_ts <- df_stock$volume
+    print(tseries::kpss.test(sentiment_ts %>% na.omit())$p.value)
+    if (tseries::kpss.test(sentiment_ts %>% na.omit())$p.value > 0.05){
+      print(paste0("Time Series 'sentiment' of ", ticker, " is not stationary!"))
+    }else if (tseries::kpss.test(price_ts %>% na.omit())$p.value > 0.05){
+      print(paste0("Time Series 'sentiment' of ", ticker, " is not stationary!"))
+    }else if (tseries::kpss.test(volume_ts %>% na.omit())$p.value > 0.05){
+      print(paste0("Time Series 'sentiment' of ", ticker, " is not stationary!"))
+    }
+    
     
     res_lst[[ticker]][["price"]] <- ccf(sentiment_ts, price_ts, lag.max = 5, plot=F, na.action = na.action)
     res_lst[[ticker]][["volume"]] <- ccf(sentiment_ts, volume_ts, lag.max = 5, plot=F, na.action = na.action)

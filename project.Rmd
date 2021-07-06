@@ -612,6 +612,7 @@ ggplotly(ggplot(data=summary_users, aes(x=type_participation))+
 # Final Analysis
 
 To answer the the question, if the sentiment towards a specific ticker has an influence on market data, cross-correlation between the sentiment and the percentage change of the price is used.
+
 During the cross-correlation time series are lagged against each other, so that the  $t - lag$ values of one time series are correlated against the values of the other time series at time $t$.
 
 Since the mentioned tickers are quite sparse, only the top 10 mentioned tickers are used and missing sentiment values are handled by `r na.pass`, so they are not considered in the calculation, but simply passed through.
@@ -619,13 +620,16 @@ Imputation of the missing values is also not feasable, since sentiment values ar
 
 The results are visualized using the ACF plots which are returned by the `r ccf` function. It shows the correlation of the two time series depending on the lag, including 95% confidence intervals.
 
+Since applying a cross correlation function assumes that the both time series are stationary. To test this, the `r tseries::adf.test` implemetation of the Dickey–Fuller test is used.
 
-The results for correlating the sentiment against the adjusted price returns are shown below.
+
+The results for correlating the sentiment and volume against the adjusted price returns are shown below.
 
 ```{r}
 source("analysis_helpers.R")
 stocks_prep <- prepare_analysis(stocks) 
 wsb_prep <- prepare_analysis(wsb)
+combined_prep <- prepare_analysis(rbind(stocks, wsb))
 ```
 ```{r}
 stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.05)
@@ -633,6 +637,11 @@ stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot
 ```{r}
 wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2)
 ```
+
+Negative lag means that sentiment could be used to predict the price or volume of a stock.
+The ACF plots show only low general correlation between sentiment and adjusted price returns, none of which are significant. Reason for this is most likely the sparseness of the ticker mentions.
+
+This could be remedied by finding a way to extract posts which include a specific ticker, so instead of getting the top comments and posts, you only get posts related to a specific ticker.
 
 
 ```{r}
