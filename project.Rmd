@@ -244,7 +244,7 @@ For this approach a list of the top 100 actively traded stocks traded on the NYS
 ```{r}
 nyse_lst <- read.csv("nyse_lst.csv")
 nyse_lst %>% 
-  head()
+  head() %>%
   kbl() %>%
   kable_material(c("hover")) %>%
   kable_styling(full_width = FALSE)
