@@ -471,7 +471,7 @@ count_per_week <- function(dat, ticker_list){
   for (t in ticker_list){
     res_lst[[t]] <- dat %>%
       filter(t %in% ticker) %>%
-      group_by("CW" = paste0(lubridate::week(comm_date), "/", lubridate::year(comm_date))) %>%
+      group_by("CW" = paste0(lubridate::year(comm_date), "/", ifelse(nchar(lubridate::week(comm_date))==1, paste0("0", lubridate::week(comm_date)), lubridate::week(comm_date)))) %>%
       summarise(count=n(), ticker=t)
   }
   return(dplyr::bind_rows(res_lst))
