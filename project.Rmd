@@ -92,7 +92,7 @@ Each comment contains the information of the content of the comment, user that m
 
 Once a user from reddit is deleted, either the column "user" or the column "author" has the value "[deleted]". In this situation is not possible to uniquely identify users and creating the correct connection between them, which is important for the community detection. To visualize this problem, the following graphics, shows the percentage of comments per day that have deleted authors or users. In both subreddits, the highest loss of comments is originating from deleted authors with up to 50% of loss.
 
-```{r proportionDeletedUsers, echo=FALSE,warning = FALSE}
+```{r proportionDeletedUsers, echo=FALSE, warning = FALSE}
 collectionName <- "stocks"
 source("reddit_related_functions.R")
 
@@ -210,9 +210,11 @@ wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment) %>%
 Since we are only interested in if a stock is positive, negative or neutral, the values are recoded to 1, -1 and 0 respectively.
 ```{r}
 wsb <- wsb %>% mutate(sentiment = case_when(sentiment > 0 ~ 1,
-                                            sentiment < 0 ~ -1))
+                                            sentiment < 0 ~ -1,
+                                            sentiment == 0 ~ 0))
 stocks <- stocks %>% mutate(sentiment = case_when(sentiment > 0 ~ 1,
-                                            sentiment < 0 ~ -1))
+                                            sentiment < 0 ~ -1,
+                                            sentiment == 0 ~ 0))
 ```
 
 
@@ -472,8 +474,10 @@ plot_stocks
 ```{r, echo=F}
 plot_wsb
 ```
+
 While both subreddits talk mostly about the same tickers, the counts are significantly different.
 More important for the analysis is the mentions of the tickers by week; there should be no longer time frames without mentions.
+
 ```{r, echo=F}
 count_per_week <- function(dat, ticker_list){
   res_lst <- list()
@@ -488,8 +492,7 @@ count_per_week <- function(dat, ticker_list){
 
 tickers_week_wsb <- count_per_week(wsb, wsb_ticker$ticker)
 tickers_week_stocks <- count_per_week(stocks, stocks_ticker$ticker)
-```
-```{r}
+
 ggplot(tickers_week_wsb, aes(x=CW, y=count)) +
   geom_col(position = "dodge") +
   theme(axis.text.x=element_text(angle = -45, hjust = 0)) +
@@ -504,6 +507,22 @@ ggplot(tickers_week_stocks, aes(x=CW, y=count)) +
 ```
 It is evident here, that the mentions of tickers vary greatly. There are some weeks, where no tickers are mentioned and the counts are mostly very low. This has to be accounted for during the final analysis.
 
+### Sentiment
+
+```{r}
+wsb_sent <- wsb %>% mutate(sentiment= recode(sentiment, "-1" = "Negative", "0" = "Neutral", "1" = "Positive")) %>% group_by(sentiment) %>% summarise(count=n())
+stocks_sent <- stocks %>% mutate(sentiment= recode(sentiment,"-1" = "Negative", "0" = "Neutral", "1" = "Positive")) %>% group_by(sentiment) %>% summarise(count=n())
+
+ggplotly(ggplot(wsb_sent, aes(x=sentiment, y=count))+
+           geom_col()+
+           labs(title="Count of sentiment categories for r/wallstreetbets"))
+
+ggplotly(ggplot(stocks_sent, aes(x=sentiment, y=count))+
+           geom_col()+
+           labs(title="Count of sentiment categories for r/stocks", x= "Sentiment"))
+```
+
+Both reddits have similar distribution for the sentiment categories, the majority of comments are neutral and are not adding information about the users sentiment towards the stock.
 
 ### User's interaction in subreddits
 
@@ -549,10 +568,14 @@ Since applying a cross correlation function assumes that the both time series ar
 
 The ACF Plots and summary tables for the top 10 tickers mentioned by the subreddits are shown below.
 
-```{r, warning=FALSE}
+```{r, message=FALSE}
 source("analysis_helpers.R")
 stocks_prep <- prepare_analysis(stocks) 
 wsb_prep <- prepare_analysis(wsb)
+```
+
+```{r, echo=F}
+wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.)/2, margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/wallstreetbets")
 ```
 
 ```{r, echo=F}
@@ -563,11 +586,8 @@ wsb_prep %>%
   kable_material(c("hover")) %>%
   kable_styling(full_width = TRUE)
 ```
+The mean correlation at lag - 2 is 0.22, so the mean sentiment of wallstreetbets on a day could be used to predict market movement two days later.
 
-
-```{r, echo=F}
-wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.)/2, margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/wallstreetbets")
-```
 ```{r, echo=F}
 stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.)/2, margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/stocks")
 ```
