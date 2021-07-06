@@ -88,7 +88,7 @@ data in a clean format."),
                          tabPanel(title = "Screencast video",
                                   tags$a( href = "", target="_blank",
                                           tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
-                                  )),
+                                  ))
                          ))
         ),
 
