@@ -5,10 +5,10 @@ In January of 2021, a major short squeeze of the stock of video game retailer Ga
  
 Several interesting questions regarding the influence of these subreddits on the stock market emerge from this event. In this project, we present an analysis of communities on the finance related subreddits 'stocks' and 'wallstreetbets', the sentiment towards stocks on this communities and the correlation between those sentiment with the stock prices. 
 
-<a href="https://www.reddit.com/r/wallstreetbets/" ><img src="https://github.com/pblml/datsciR_reddit/blob/main/www/WallStreetBets.png" width="250"></a> <a href="https://www.reddit.com/r/stocks/" ><img src="https://github.com/pblml/datsciR_reddit/blob/main/www/stocks.png" width="100"></a>
+<a href="https://www.reddit.com/r/wallstreetbets/" ><img src="https://github.com/pblml/datsciR_reddit/blob/main/app/www/WallStreetBets.png" width="250"></a> <a href="https://www.reddit.com/r/stocks/" ><img src="https://github.com/pblml/datsciR_reddit/blob/main/app/www/stocks.png" width="100"></a>
 
-URL Website: 
+URL Website: https://dianaguzman.shinyapps.io/redditFinanceAnalysis/
 
-URL Screencast:
+URL Screencast: https://youtu.be/AtRUgU-btCs
 
-URL Process notebook:
+URL Process notebook: https://rpubs.com/dianacgr/redditFinanceAnalysis
