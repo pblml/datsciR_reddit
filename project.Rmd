@@ -311,7 +311,7 @@ In order to compare the cluster algorithms, we evaluate all of algorithms over 4
 
 
 
-```{r cluster_evaluation, warning=FALSE}
+```{r cluster_evaluation, warning=FALSE, message=FALSE}
 
 evaluations <- data.frame(
   test = 1:4,
@@ -324,6 +324,13 @@ evaluations <- data.frame(
 result <- data.frame()
 for (i in 1:nrow(evaluations)) {
   row <- evaluations[i, ]
+  if(row$collectionName =="wallstreetbets"){
+    eval_df <-  wsb %>%
+      filter(comm_date>=row$initial_time, comm_date<=row$end_time)
+  }else{
+    eval_df <-  stocks %>%
+      filter(comm_date>=row$initial_time, comm_date<=row$end_time)
+  }
   result_evaluation <-
     clustering_evaluation(row$test,
                           "reddit",
@@ -359,6 +366,7 @@ ggplotly(ggplot(data=modularity_clusters, aes(x=id_test))+
 
 In terms of modularity, Louvain performed better than Infomap and Label Propagation. The highest possible value for modularity is 1.0 when all of the clusters are disconnected subgraphs. The values that Louvain achieved are higher than 0.55 which represents a strong community structure. 
 
+When we evaluate the execution time for the different algorithms, Louvain outperfoms Infomap but the execution time is very similar between Louvain and Label propagation. 
 
 ```{r echo=FALSE, warning=FALSE, eval=F}
 time_algorithms <- result %>%
@@ -372,7 +380,7 @@ ggplotly(ggplot(data=time_algorithms, aes(x=id_test))+
                  title = "Execution time per algorithm"))
 ```
 
-In addition to the previous test in separated samples, we assessed the robustness of Louvain using the library robin [@policastro2021robustness] for the whole data for each subreddit. 
+In addition to the previous test in separated samples, we assessed the robustness of Louvain using the library *robin* [@policastro2021robustness] for the whole data for each subreddit. 
 
 To test the goodness of the communities detected by Louvain in the each complete subreddit we followed the first workflow from robin, where the stability of the algorithm is compared against random perturbations of the original graph. The stability measure we chose was VI metric. The results from this evaluation are in the next plots.
 
@@ -386,12 +394,12 @@ To test the goodness of the communities detected by Louvain in the each complete
 
 For both datasets the stability measure curves for Louvain compared to the null model are very close. For the stocks subreddit the AUC values we got were **0.2631427** for the real data and **0.2494959** for the null model and for the wallstreetbets subreddit were **0.2357264** for the real data and **0.2471575** for the null model. Considering also the p-values on the right side of the plots, we can conclude that the results from the Louvain community detection are statistically significant, which means that is a good algorithm for this dataset. For Wallstreetbets it is statistically significant just for perturbation lower than 0.3, which is not so ideal. 
 
-When we compare with robin the best two algorithms from our modularity test (Louvain and Label Propagation) is possible to back up the findings that Louvain performs better for both subreddit datasets. 
+When we compare with robin the best two algorithms from our modularity test (Louvain and Label Propagation) is possible to confirm the previous findings. For both subreddits Louvain outperforms the Label Propagation algorithm. 
 
 ![](robinEvaluation/Stocks_louvain_vs_lp.jpeg )
 ![](robinEvaluation/WSB_louvain_vs_lp.jpeg )
 
-Considering these tests, we selected Louvain as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm.
+Considering these tests, we selected *Louvain* as the clustering algorithm for the rest of the analysis in our project. For the previous graph representation of the data, the following communities were created with Louvain algorithm.
 
 ```{r cluster_example, echo = FALSE}
 #create communities
