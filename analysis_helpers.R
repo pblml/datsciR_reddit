@@ -50,7 +50,6 @@ ccf_by_price_vol <- function(df_lst, na.action = na.pass){
   res_lst <- list()
 
   for (ticker in names(df_lst)){
-    print(ticker)
     df_stock <- df_lst[[ticker]]
     
     sentiment_ts <- df_stock %>%
@@ -74,16 +73,16 @@ ccf_plots <- function(ccf_lst){
       autoplot() +
       scale_x_continuous(breaks = seq(-5, 5))) %>% 
       plotly::ggplotly() %>%
-      layout(annotations = list(x = 0.3 , y = 1.2, text = paste0(ticker, " Sentiment/Price"), showarrow = F,
+      layout(annotations = list(x = 0.3 , y = 1.5, text = paste0(ticker, " Sentiment/Price"), showarrow = F,
                                 xref='paper', yref='paper'))
 
-    plot_lst[[paste0(ticker, "_volume")]] <- (ccf_lst[[ticker]][["volume"]] %>% 
-      autoplot() +
-      scale_x_continuous(breaks = seq(-5, 5))) %>%
-      plotly::ggplotly() %>%
-      layout(annotations = list(x = 0.8 , y = 1.2, text = paste0(ticker, " Sentiment/Volume"), showarrow = F,
-                                xref='paper', yref='paper'))
-    
+    # plot_lst[[paste0(ticker, "_volume")]] <- (ccf_lst[[ticker]][["volume"]] %>% 
+    #   autoplot() +
+    #   scale_x_continuous(breaks = seq(-5, 5))) %>%
+    #   plotly::ggplotly() %>%
+    #   layout(annotations = list(x = 0.8 , y = 1.2, text = paste0(ticker, " Sentiment/Volume"), showarrow = F,
+    #                             xref='paper', yref='paper'))
+    # 
   }
   return(plot_lst)
 }
@@ -96,10 +95,12 @@ ccf_table <- function(cff_output) {
     rowwise() %>%
     mutate(rowMean = mean(c_across())) %>%
     ungroup() %>%
-    mutate(lag=seq(-5, 5)) %>%
     round(2) %>%
-    select(lag, everything(), rowMean) %>%
-    t() %>% as.data.frame()
+    t() %>%
+    as.data.frame()
+  
+  colnames(tmp_table) <- seq(-5, 5)
+  
   return(tmp_table)
 }
 

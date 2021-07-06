@@ -561,27 +561,21 @@ Imputation of the missing values is also not feasable, since sentiment values ar
 
 The results are visualized using the ACF plots which are returned by the `r ccf` function. It shows the correlation of the two time series depending on the lag, including 95% confidence intervals.
 
-Since applying a cross correlation function assumes that the both time series are stationary. To test this, the `r tseries::adf.test` implemetation of the Dickey–Fuller test is used.
+Since applying a cross correlation function assumes that the both time series are stationary, this is ensured de-trending the timeseries before the calculation using `r ndiffs` and `r diff`.
 
-
-The results for correlating the sentiment and volume against the adjusted price returns are shown below.
+The results for correlating the sentiment the adjusted price returns are shown below.
 
 ```{r, warning=FALSE}
 source("analysis_helpers.R")
 stocks_prep <- prepare_analysis(stocks) 
 wsb_prep <- prepare_analysis(wsb)
 ```
-```{r}
-stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.02)
+```{r, echo=F}
+stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.), margin = 0.02)
 ```
-```{r}
-wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.02)
+```{r, echo=F}
+wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.), margin = 0.02)
 ```
-
-Negative lag means that sentiment could be used to predict the price or volume of a stock.
-The ACF plots show only low general correlation between sentiment and adjusted price returns. Most of the corre Reason for this is most likely the sparseness of the ticker mentions.
-
-This could be remedied by finding a way to extract posts which include a specific ticker, so instead of getting the top comments and posts, only posts related to a specific ticker get returned.
 
 
 ```{r}
