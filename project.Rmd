@@ -84,9 +84,7 @@ end_time <-"2021-02-12"
 sample <- loadDataDates(databaseName,collectionName,initial_time,end_time) %>%
   subset(select = -c(ticker,sentiment))
 
-kbl(head(sample,3)) %>%
-  kable_material(c("hover")) %>%
-  kable_styling(full_width = TRUE)
+kbl(head(sample,3))  
 ```
 Each comment contains the information of the content of the comment, user that make the comment, the related post including the content and author. Moreover, the column "structure" define the position occupied by the comment in the hierarchy of comments related to a post.
 

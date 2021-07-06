@@ -92,16 +92,16 @@ data in a clean format."),
             tabPanel(title = "Resources",
                      navlistPanel(
                          tabPanel(title = "Rmarkdown Notebook",
-                                  tags$a( href = "", target="_blank",
+                                  tags$a( href = "https://rpubs.com/dianacgr/redditFinanceAnalysis", target="_blank",
                                           tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
                                   )),
                          tabPanel(title = "Github",
-                                  tags$a( href = "", target="_blank",
+                                  tags$a( href = "https://github.com/pblml/datsciR_reddit", target="_blank",
                                           tags$img( id = "github-logo", src="logo_github.jpg",height = 200, width = 200)
                                   )),
                          tabPanel(title = "Screencast video",
-                                  tags$a( href = "", target="_blank",
-                                          tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
+                                  tags$a( href = "https://youtu.be/AtRUgU-btCs", target="_blank",
+                                          tags$img( id = "rmarkdown-logo", src="yt_logo_rgb_light.png",height = 150, width =350)
                                   )),
                          tabPanel(title = "Data",
                                   tags$a( href = "https://github.com/pblml/datsciR_reddit/blob/main/stocks.Rds", target="_blank",
