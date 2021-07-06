@@ -414,6 +414,7 @@ Initially we explore how the data is distributed in both reddits by getting the 
 
 ### Tickers
 
+ 
 ```{r}
 par(mfrow=c(1,2),
     oma = c(0,0,0,0),
@@ -582,23 +583,23 @@ Since applying a cross correlation function assumes that the both time series ar
 
 The results for correlating the sentiment and volume against the adjusted price returns are shown below.
 
-```{r}
+```{r, warning=FALSE}
 source("analysis_helpers.R")
 stocks_prep <- prepare_analysis(stocks) 
 wsb_prep <- prepare_analysis(wsb)
 combined_prep <- prepare_analysis(rbind(stocks, wsb))
 ```
 ```{r}
-stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.05)
+stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.02)
 ```
 ```{r}
-wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2)
+wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% plot_ccf() %>% subplot(., nrows = length(.)/2, margin = 0.02)
 ```
 
 Negative lag means that sentiment could be used to predict the price or volume of a stock.
-The ACF plots show only low general correlation between sentiment and adjusted price returns, none of which are significant. Reason for this is most likely the sparseness of the ticker mentions.
+The ACF plots show only low general correlation between sentiment and adjusted price returns. Most of the corre Reason for this is most likely the sparseness of the ticker mentions.
 
-This could be remedied by finding a way to extract posts which include a specific ticker, so instead of getting the top comments and posts, you only get posts related to a specific ticker.
+This could be remedied by finding a way to extract posts which include a specific ticker, so instead of getting the top comments and posts, only posts related to a specific ticker get returned.
 
 
 ```{r}
