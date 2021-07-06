@@ -563,7 +563,7 @@ The results are visualized using the ACF plots which are returned by the `r ccf`
 
 Since applying a cross correlation function assumes that the both time series are stationary, this is ensured de-trending the timeseries before the calculation using `r ndiffs` and `r diff`.
 
-The results for correlating the sentiment the adjusted price returns are shown below.
+The ACF Plots for the top 10 tickers mentioned by the subreddits are shown below.
 
 ```{r, warning=FALSE}
 source("analysis_helpers.R")
@@ -571,10 +571,10 @@ stocks_prep <- prepare_analysis(stocks)
 wsb_prep <- prepare_analysis(wsb)
 ```
 ```{r, echo=F}
-stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.), margin = 0.02)
+stocks_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.), margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/wallstreetbets")
 ```
 ```{r, echo=F}
-wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.), margin = 0.02)
+wsb_prep %>% ccf_by_price_vol(na.action = na.pass) %>% ccf_plots() %>% subplot(., nrows = length(.), margin = 0.02) %>% layout(title="ACF Plots for Top 10 Tickers of r/wallstreetbets")
 ```
 
 
