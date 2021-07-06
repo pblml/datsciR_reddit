@@ -336,7 +336,8 @@ for (i in 1:nrow(evaluations)) {
                           "reddit",
                           row$collectionName,
                           row$initial_time,
-                          row$end_time)
+                          row$end_time,
+                          eval_df)
   #update number of comments per test
   evaluations[[i, "number_comments"]] <-
     result_evaluation$number_comments
