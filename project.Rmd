@@ -311,8 +311,8 @@ In order to compare the cluster algorithms, we evaluate all of algorithms over 4
 
 
 
+```{r cluster_evaluation, warning=FALSE}
 
-```{r cluster_evaluation, echo=FALSE, warning=FALSE, eval=F}
 evaluations <- data.frame(
   test = 1:4,
   collectionName = c("wallstreetbets", "stocks", "wallstreetbets", "stocks"),
@@ -386,7 +386,7 @@ To test the goodness of the communities detected by Louvain in the each complete
 
 For both datasets the stability measure curves for Louvain compared to the null model are very close. For the stocks subreddit the AUC values we got were **0.2631427** for the real data and **0.2494959** for the null model and for the wallstreetbets subreddit were **0.2357264** for the real data and **0.2471575** for the null model. Considering also the p-values on the right side of the plots, we can conclude that the results from the Louvain community detection are statistically significant, which means that is a good algorithm for this dataset. For Wallstreetbets it is statistically significant just for perturbation lower than 0.3, which is not so ideal. 
 
-When we compare with robin the best two algorithms from our modularity test (Louvain and Label Propagation) is possible to back up the findings that Louvain performs better for both subreddit datasets. For both subreddits the 
+When we compare with robin the best two algorithms from our modularity test (Louvain and Label Propagation) is possible to back up the findings that Louvain performs better for both subreddit datasets. 
 
 ![](robinEvaluation/Stocks_louvain_vs_lp.jpeg )
 ![](robinEvaluation/WSB_louvain_vs_lp.jpeg )
@@ -494,30 +494,6 @@ ggplot(tickers_week_stocks, aes(x=CW, y=count)) +
   labs(title="Count of ticker mentions by week for r/stocks")
 ```
 It is evident here, that the mentions of tickers vary greatly. There are some weeks, where no tickers are mentioned and the counts are mostly very low. This has to be accounted for during the final analysis.
-
-
-### 
-```{r comments_subreddits, echo=FALSE }
-comments_per_day_stocks <-getCommentsPerDay(databaseName,"stocks") %>%
-  mutate(subreddit = "Stocks")
-comments_per_day_wallstreetbets <-getCommentsPerDay(databaseName,"wallstreetbets") %>%
-  mutate(subreddit = "Wallstreetbets") %>%
-  rbind(.,comments_per_day_stocks) %>%
-  rename(date='_id')%>%
-  mutate(dayWeek = weekdays(as.Date(date)),
-         cw = strftime(date, format = "%V"))
-
-#change date format
-comments_per_day_wallstreetbets$date <- ymd(comments_per_day_wallstreetbets$date)
-
-
-ggplotly(ggplot(data=comments_per_day_wallstreetbets, aes(x=date)) +
-           geom_line(aes(y=total, color=subreddit))+
-           scale_x_date(date_labels = "%m-%Y")+
-           labs(title="Comments per day",
-                x = "Date",
-                y = "Comments"))
-```
 
 
 ### User's interaction in subreddits

@@ -47,9 +47,11 @@ data in a clean format."),
                      tags$p(tags$b("2. Answer to a comment:")," comments made as answer to other comments. For this case an edge is created between two users and it requires to use the hierarchy of comments to find the proper connection."),
                      tags$p("The weight of the edges is given by the number of interactions between the two users."),
                      tags$h2("Community detection algorithms"),
-                     tags$p("For the community detection we considered the algorithms Louvain, Infomap and Label Propagation from the igraph library. To compare them we used as measure the modularity in 4 different samples of the data"),
-                     
-                     tags$p("An example of the creation of the communities with the Louvain algorithm can be found in the Interactive Community Analysis Tab")
+                     tags$p("For the community detection we considered the algorithms Louvain, Infomap and Label Propagation from the igraph library. To compare them we used as measure the modularity in 4 different samples of the data.
+                            The algorithms were compared in terms of the Modularity of the generated communities and the execution time. The results are shown below:"),
+                     tags$img( id = "modularity", src="logo-rmarkdown.jpg"),
+                     tags$img( id = "executionTime", src="logo-rmarkdown.jpg"),
+                     tags$p("According to our results, the best algorithm for the datasets is Louvain. An interactive example of the creation of the communities with this algorithm can be found in the Interactive Community Analysis Tab")
                      ),
             tabPanel(title = "Stock Analysis",""),
             tabPanel(title = "Interactive Community Analysis",
@@ -88,7 +90,15 @@ data in a clean format."),
                          tabPanel(title = "Screencast video",
                                   tags$a( href = "", target="_blank",
                                           tags$img( id = "rmarkdown-logo", src="logo-rmarkdown.jpg",height = 200, width = 200)
-                                  ))
+                                  )),
+                         tabPanel(title = "Data",
+                                  tags$a( href = "https://github.com/pblml/datsciR_reddit/blob/main/stocks.Rds", target="_blank",
+                                          tags$img( id = "rmarkdown-logo", src="stocks.png",height = 200, width = 200)
+                                  ),
+                                  tags$a( href = "https://github.com/pblml/datsciR_reddit/blob/main/wsb.Rds", target="_blank",
+                                          tags$img( id = "rmarkdown-logo", src="WallStreetBets.png",height = 200, width = 400)
+                                  )
+                                  )
                          ))
         ),
 
