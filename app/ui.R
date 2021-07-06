@@ -49,8 +49,8 @@ data in a clean format."),
                      tags$h2("Community detection algorithms"),
                      tags$p("For the community detection we considered the algorithms Louvain, Infomap and Label Propagation from the igraph library. To compare them we used as measure the modularity in 4 different samples of the data.
                             The algorithms were compared in terms of the Modularity of the generated communities and the execution time. The results are shown below:"),
-                     tags$img( id = "modularity", src="logo-rmarkdown.jpg"),
-                     tags$img( id = "executionTime", src="logo-rmarkdown.jpg"),
+                     tags$img( id = "modularity", src="modularity_clusters.jpg"),
+                     tags$img( id = "executionTime", src="time_execution_clusters.jpg"),
                      tags$p("According to our results, the best algorithm for the datasets is Louvain. An interactive example of the creation of the communities with this algorithm can be found in the Interactive Community Analysis Tab")
                      ),
             tabPanel(title = "Stock Analysis",""),

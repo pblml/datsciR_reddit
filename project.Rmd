@@ -369,7 +369,7 @@ In terms of modularity, Louvain performed better than Infomap and Label Propagat
 
 When we evaluate the execution time for the different algorithms, Louvain outperfoms Infomap but the execution time is very similar between Louvain and Label propagation. 
 
-```{r echo=FALSE, warning=FALSE, eval=F}
+```{r echo=FALSE, warning=FALSE}
 time_algorithms <- result %>%
   filter(measure == "time")
 
