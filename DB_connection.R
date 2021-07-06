@@ -18,6 +18,8 @@ loadData <- function(databaseName,collectionName) {
   data
 }
 
+
+
 loadDataCol <- function(databaseName,collectionName) {
   # Connect to the database
   db <- mongo(collection = collectionName,
