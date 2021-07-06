@@ -177,8 +177,10 @@ print(modified_dict %>% filter(y<0) %>% sample_n(10))
 ```
 
 ```{r loading data}
-wsb <- loadData("reddit", "wallstreetbets")
-stocks <- loadData("reddit", "stocks")
+#wsb <- loadData("reddit", "wallstreetbets")
+#stocks <- loadData("reddit", "stocks")
+stocks <- readRDS("stocks.Rds")
+wsb <- readRDS("wsb.Rds")
 ```
 
 After adding the sentiment, we take a look at the the most positive and negative comments of both subreddits.
@@ -281,53 +283,8 @@ The weight of the edges is given by the number of interactions between the two u
 
 ```{r graphcreation, echo=FALSE, warning = FALSE}
 
-initial_time <-"2021-01-23"
-end_time <-"2021-01-27"
-collectionName <- "stocks"
-
-raw_data <- stocks %>%
-  filter(user!="[deleted]",comm_date>=lubridate::ymd(initial_time),
-         comm_date<=lubridate::ymd(end_time))
-
-#for authors that have name [deleted] a new name is assigned with the structure "author_number"
-new_authors_names <-raw_data %>%
-  filter(author=="[deleted]") %>%
-  distinct(link) %>%
-  mutate(author_name = paste0("author_",row_number(.)))
-
-raw_data <-raw_data %>%
-  left_join(., new_authors_names, by=c( "link"="link")) %>%
-  mutate(author = ifelse(author == "[deleted]", author_name, author))
-
-#create dataframe with information about direct comments to posts and nested comments
-comments_posts <- raw_data %>%
-  filter(!grepl("_",structure)) %>%
-  rename(
-    from = user,
-    to = author
-  )%>%
-  subset( select = c(from,to))
-
-nested_comments <-raw_data %>% 
-  mutate(
-    from = structure,
-    to = gsub("^(.*)_\\d+$", "\\1", structure) 
-  )%>%
-  subset( select = c(user,from,to,link))%>%
-  left_join(., ., by=c( "link"="link","from"="to")) %>% 
-  drop_na("user.y") %>%
-  select("from"=user.y, "to"=user.x) 
-
-#combination of the connections between reddit users
-connections <-rbind(comments_posts, nested_comments) %>% 
-  filter(from!=to) %>% 
-  group_by(from, to) %>%
-  summarise(weight = n()) %>% 
-  ungroup() %>%
-  mutate(width = weight+5)
-
 #create igraph object
-g <- graph_from_data_frame(connections,directed=FALSE)
+g <- create_subreddit_graph_from_df(raw_data)
 
 plot(g,vertex.label=NA, vertex.color="blue", vertex.size=5)
 ```

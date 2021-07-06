@@ -253,6 +253,19 @@ get_related_tickers_community <-
     })
   }
 
+get_sentiment_community<-function(comments, communities, community){
+  tryCatch({
+    sentiment_comments <- comments %>%
+      filter(user %in% as.list(communities[[community]]) | author %in%
+               as.list(communities[[community]])) %>%
+      select(sentiment)
+    mean(sentiment_comments$sentiment)
+  },
+  error = function(cond) {
+    return(c(""))
+  })
+}
+
 
 get_related_tickers_user <- function(comments, nameUser) {
   tryCatch({
@@ -331,12 +344,11 @@ create_communities_visualization <-
 #create igraph from dataframe
 create_subreddit_graph_from_df <-
   function(raw_data) {
-    
     #for authors that have name [deleted] a new name is assigned with the structure "author_number"
     new_authors_names <- raw_data %>%
       filter(author == "[deleted]") %>%
-      distinct(link) %>%
-      mutate(author_name = paste0("author_", row_number(.)))
+      distinct(link)
+    new_authors_names$author_name <-list(paste0("author_", row_number(new_authors_names)))
     
     raw_data <- raw_data %>%
       left_join(., new_authors_names, by = c("link" = "link")) %>%
@@ -358,7 +370,9 @@ create_subreddit_graph_from_df <-
       select("from" = user.y, "to" = user.x)
     
     connections <- rbind(comments_posts, nested_comments) %>%
+      rowwise() %>%
       filter(from != to) %>%
+      ungroup()%>%
       group_by(from, to) %>%
       summarise(weight = n()) %>%
       ungroup() %>%
@@ -382,6 +396,9 @@ create_communities_visualization_from_df <-
     tickers_communities <- lapply(1:length(communities_cl),
                                   function(x)
                                     get_related_tickers_community(raw_data, communities_cl, x))
+    sentiment_communities <- lapply(1:length(communities_cl),
+                                  function(x)
+                                    get_sentiment_community(raw_data, communities_cl, x))
     
     #get nodes and edges
     nodes <- do.call(rbind.data.frame, as.list(V(g)$name)) %>%
@@ -393,6 +410,7 @@ create_communities_visualization_from_df <-
             remove = FALSE,
             sep = ": ") %>%
       select(id, group, label)
+    
     
     #get tickers per node
     nodes$tickers = lapply(nodes$id,
@@ -413,7 +431,27 @@ create_communities_visualization_from_df <-
       visPhysics(
         maxVelocity = 1,
         repulsion = list(centralGravity = -0.5, springLength = 500)
-      )
+      ) 
+    
+    #include color into each group depending on the mean sentiment
+    comm_names <- lapply(1:length(communities_cl),
+                         function(x) 
+                           paste0(x,": ",tickers_communities[x]))
+    
+    colors <- c("#FC6C85","#FC94A1","#FFCCCB","#DCDCDC","#CDFFCC","#B0F5AB","#90EF90")
+    sentiment_threshold <- c(-1,-0.6,-0.01,0,0.01,0.6,1)
+    
+    for(x in 1:length(comm_names)){
+      sentiment <- sentiment_communities[x]
+      #print(sentiment)
+      color_position <- findInterval(sentiment, sentiment_threshold)
+      #print(color_position)
+      visualization <- visGroups(visualization,groupname = as.character(comm_names[x]), 
+                color = colors[color_position])
+    }
+     
+    visualization %>%  visOptions(highlightNearest = T)        
+    
   }
 
 # collectionName <- "stocks"
