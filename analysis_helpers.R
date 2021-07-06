@@ -96,10 +96,12 @@ ccf_table <- function(cff_output) {
     rowwise() %>%
     mutate(rowMean = mean(c_across())) %>%
     ungroup() %>%
-    mutate(lag=seq(-5, 5)) %>%
     round(2) %>%
-    select(lag, everything(), rowMean) %>%
-    t() %>% as.data.frame()
+    t() %>%
+    as.data.frame()
+  
+  colnames(tmp_table) <- seq(-5, 5)
+  
   return(tmp_table)
 }
 
