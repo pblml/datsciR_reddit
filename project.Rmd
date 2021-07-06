@@ -210,9 +210,11 @@ wsb %>% arrange(desc(sentiment)) %>% head() %>% select(comment, sentiment) %>%
 Since we are only interested in if a stock is positive, negative or neutral, the values are recoded to 1, -1 and 0 respectively.
 ```{r}
 wsb <- wsb %>% mutate(sentiment = case_when(sentiment > 0 ~ 1,
-                                            sentiment < 0 ~ -1))
+                                            sentiment < 0 ~ -1,
+                                            sentiment == 0 ~ 0))
 stocks <- stocks %>% mutate(sentiment = case_when(sentiment > 0 ~ 1,
-                                            sentiment < 0 ~ -1))
+                                            sentiment < 0 ~ -1,
+                                            sentiment == 0 ~ 0))
 ```
 
 
@@ -504,6 +506,22 @@ ggplot(tickers_week_stocks, aes(x=CW, y=count)) +
 ```
 It is evident here, that the mentions of tickers vary greatly. There are some weeks, where no tickers are mentioned and the counts are mostly very low. This has to be accounted for during the final analysis.
 
+### Sentiment
+
+```{r}
+wsb_sent <- wsb %>% mutate(sentiment= recode(sentiment, "-1" = "Negative", "0" = "Neutral", "1" = "Positive")) %>% group_by(sentiment) %>% summarise(count=n())
+stocks_sent <- stocks %>% mutate(sentiment= recode(sentiment,"-1" = "Negative", "0" = "Neutral", "1" = "Positive")) %>% group_by(sentiment) %>% summarise(count=n())
+
+ggplotly(ggplot(wsb_sent, aes(x=sentiment, y=count))+
+           geom_col()+
+           labs(title="Count of sentiment categories for r/wallstreetbets"))
+
+ggplotly(ggplot(stocks_sent, aes(x=sentiment, y=count))+
+           geom_col()+
+           labs(title="Count of sentiment categories for r/stocks", x= "Sentiment"))
+```
+
+Both reddits have similar distribution for the sentiment categories, the majority of comments are neutral and are not adding information about the users sentiment towards the stock.
 
 ### User's interaction in subreddits
 
